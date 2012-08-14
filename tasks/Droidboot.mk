@@ -53,6 +53,10 @@ droidboot_modules := \
 	kexec \
 	droidboot \
 
+ifneq ($(call intel-target-need-intel-libraries),)
+droidboot_modules += libimf libintlc libsvml
+endif
+
 droidboot_system_files := $(call module-installed-files,$(droidboot_modules))
 
 # $(1): source base dir
