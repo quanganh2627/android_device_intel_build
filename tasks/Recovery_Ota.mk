@@ -17,6 +17,27 @@ recovery_resource_deps := $(shell find $(recovery_resources_common) \
   $(recovery_resources_private) -type f)
 recovery_fstab := $(strip $(wildcard $(TARGET_DEVICE_DIR)/fstab))
 
+recovery_modules := \
+	toolbox \
+	mksh \
+	strace \
+	linker \
+	libc \
+	libcutils \
+	liblog \
+	libm \
+	libstdc++ \
+	libusbhost
+
+recovery_system_files := $(call module-installed-files,$(recovery_modules))
+define recovery-copy-files
+$(hide) $(foreach srcfile,$(recovery_system_files), \
+	destfile=$(patsubst $(1)/%,$(2)/%,$(srcfile)); \
+	mkdir -p `dirname $$destfile`; \
+	cp -fR $(srcfile) $$destfile; \
+)
+endef
+
 ifeq ($(recovery_resources_private),)
   $(info Intel Recovery: No private recovery resources for TARGET_DEVICE $(TARGET_DEVICE))
 endif
@@ -73,6 +94,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 		$(INSTALLED_2NDBOOTLOADER_TARGET) \
 		$(recovery_build_prop) $(recovery_resource_deps) \
 		$(recovery_fstab) \
+		$(recovery_system_files) \
 		$(RECOVERY_INSTALL_OTA_KEYS)
 	@echo ----- Making recovery image ------
 	rm -rf $(TARGET_RECOVERY_OUT)
@@ -87,6 +109,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	cp -f $(recovery_initrc) $(TARGET_RECOVERY_ROOT_OUT)/init.rc
 	cp -f $(recovery_binary) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
 	cp -f $(recovery_watchdogd) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
+	$(hide) $(call recovery-copy-files,$(TARGET_OUT),$(TARGET_RECOVERY_ROOT_OUT)/system/)
 	cp -f $(recovery_logcat) $(TARGET_RECOVERY_ROOT_OUT)/sbin/logcat
 	cp -rf $(recovery_resources_common) $(TARGET_RECOVERY_ROOT_OUT)/
 	$(foreach item,$(recovery_resources_private), \
