@@ -23,7 +23,7 @@ droidboot_modem_proxy_tool :=
 endif
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
-droidboot_fstab := $(strip $(wildcard $(TARGET_DEVICE_DIR)/fstab))
+droidboot_fstab := $(strip $(wildcard $(TARGET_DEVICE_DIR)/recovery.fstab))
 
 droidboot_modules := \
 	libc \
