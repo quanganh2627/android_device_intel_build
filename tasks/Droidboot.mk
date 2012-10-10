@@ -6,7 +6,7 @@ DROIDBOOT_PATH := $(TOP)/bootable/droidboot
 
 INSTALLED_DROIDBOOTIMAGE_TARGET := $(PRODUCT_OUT)/droidboot.img
 
-droidboot_initrc := $(DROIDBOOT_PATH)/init.rc
+droidboot_initrc := $(TARGET_DEVICE_DIR)/droidboot.init.rc
 droidboot_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
 droidboot_ramdisk := $(PRODUCT_OUT)/ramdisk-droidboot.img
 droidboot_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
@@ -118,7 +118,10 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_DROIDBOOT_OUT)
 	rm $(TARGET_DROIDBOOT_ROOT_OUT)/init*.rc
 	echo Modifying ramdisk contents...
-	cp -f $(droidboot_initrc) $(TARGET_DROIDBOOT_ROOT_OUT)/
+	cp -f $(droidboot_initrc) $(TARGET_DROIDBOOT_ROOT_OUT)/init.rc
+	if [ -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_PRODUCT).rc ]; then \
+	cp -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_PRODUCT).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
+	fi
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 ifeq ($(strip $(BOARD_HAVE_IFX6160)),true)

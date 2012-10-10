@@ -107,6 +107,9 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	rm $(TARGET_RECOVERY_ROOT_OUT)/init*.rc
 	echo Modifying ramdisk contents...
 	cp -f $(recovery_initrc) $(TARGET_RECOVERY_ROOT_OUT)/init.rc
+	if [ -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_PRODUCT).rc ]; then \
+	cp -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_PRODUCT).rc $(TARGET_RECOVERY_ROOT_OUT); \
+	fi
 	cp -f $(recovery_binary) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
 	rm -r $(TARGET_RECOVERY_ROOT_OUT)/sbin/watchdogd
 	cp -f $(recovery_watchdogd) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
