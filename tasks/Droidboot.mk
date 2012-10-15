@@ -78,7 +78,7 @@ INTERNAL_DROIDBOOTIMAGE_ARGS := \
 	--kernel $(droidboot_kernel) \
 	--ramdisk $(droidboot_ramdisk)
 
-INTERNAL_DROIDBOOTIMAGE_ARGS += --product $(TARGET_PRODUCT)
+INTERNAL_DROIDBOOTIMAGE_ARGS += --product $(TARGET_DEVICE)
 INTERNAL_DROIDBOOTIMAGE_ARGS += --type droidboot
 
 # Assumes this has already been stripped

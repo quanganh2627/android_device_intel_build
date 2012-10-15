@@ -51,7 +51,7 @@ INTERNAL_RECOVERYIMAGE_ARGS := \
 	--kernel $(recovery_kernel) \
 	--ramdisk $(recovery_ramdisk)
 
-INTERNAL_RECOVERYIMAGE_ARGS += --product $(TARGET_PRODUCT)
+INTERNAL_RECOVERYIMAGE_ARGS += --product $(TARGET_DEVICE)
 INTERNAL_RECOVERYIMAGE_ARGS += --type recovery
 
 # Assumes this has already been stripped
@@ -134,7 +134,7 @@ endif # TARGET_MAKE_NO_DEFAULT_RECOVERY
 
 ifeq ($(TARGET_MAKE_NO_DEFAULT_OTA_PACKAGE),true)
 
-name := $(TARGET_PRODUCT)
+name := $(TARGET_DEVICE)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
 endif
@@ -301,7 +301,7 @@ ifneq ($(recovery_fstab),)
 # -----------------------------------------------------------------
 # OTA update package
 
-name := $(TARGET_PRODUCT)
+name := $(TARGET_DEVICE)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
 endif
@@ -326,7 +326,7 @@ otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 # -----------------------------------------------------------------
 # The update package
 
-name := $(TARGET_PRODUCT)
+name := $(TARGET_DEVICE)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
 endif
