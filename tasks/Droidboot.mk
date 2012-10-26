@@ -12,15 +12,17 @@ droidboot_ramdisk := $(PRODUCT_OUT)/ramdisk-droidboot.img
 droidboot_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
 droidboot_binary := $(call intermediates-dir-for,EXECUTABLES,droidboot)/droidboot
 droidboot_watchdogd := $(call intermediates-dir-for,EXECUTABLES,watchdogd)/watchdogd
-ifeq ($(strip $(BOARD_HAVE_IFX6160)),true)
+
+ifeq ($(shell test -d $(ANDROID_BUILD_TOP)/$(call intermediates-dir-for,EXECUTABLES,cmfwdl-app) && echo YES), YES)
 droidboot_modem_download_tool :=  $(call intermediates-dir-for,EXECUTABLES,cmfwdl-app)/cmfwdl-app
-ifeq ($(strip $(BOARD_HAVE_ATPROXY)), true)
+ifeq ($(shell test -d $(ANDROID_BUILD_TOP)/$(call intermediates-dir-for,EXECUTABLES,proxy-recovery) && echo YES), YES)
 droidboot_modem_proxy_tool := $(call intermediates-dir-for,EXECUTABLES,proxy-recovery)/proxy-recovery
-endif
 else
 droidboot_modem_download_tool :=
 droidboot_modem_proxy_tool :=
 endif
+endif
+
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
 droidboot_fstab := $(strip $(wildcard $(TARGET_DEVICE_DIR)/recovery.fstab))
@@ -124,9 +126,9 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	fi
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
-ifeq ($(strip $(BOARD_HAVE_IFX6160)),true)
+ifeq ($(shell test -d $(ANDROID_BUILD_TOP)/$(call intermediates-dir-for,EXECUTABLES,cmfwdl-app) && echo YES), YES)
 	cp -f $(droidboot_modem_download_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
-ifeq ($(strip $(BOARD_HAVE_ATPROXY)), true)
+ifeq ($(shell test -d $(ANDROID_BUILD_TOP)/$(call intermediates-dir-for,EXECUTABLES,proxy-recovery) && echo YES), YES)
 	cp -f $(droidboot_modem_proxy_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/sbin/proxy
 endif
 endif
