@@ -107,7 +107,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	cp -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_PRODUCT).rc $(TARGET_RECOVERY_ROOT_OUT); \
 	fi
 	cp -f $(recovery_binary) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
-	cp -f $(recovery_watchdogd) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
+	cp -f $(recovery_watchdogd) $(TARGET_RECOVERY_ROOT_OUT)/
 	$(hide) $(call recovery-copy-files,$(TARGET_OUT),$(TARGET_RECOVERY_ROOT_OUT)/system/)
 	cp -f $(recovery_logcat) $(TARGET_RECOVERY_ROOT_OUT)/sbin/logcat
 	cp -rf $(recovery_resources_common) $(TARGET_RECOVERY_ROOT_OUT)/
