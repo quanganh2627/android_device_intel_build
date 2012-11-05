@@ -19,7 +19,7 @@ droidboot_modem_proxy_tool := $(call module-installed-files,proxy-recovery)
 
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
-droidboot_fstab := $(strip $(wildcard $(TARGET_DEVICE_DIR)/recovery.fstab))
+droidboot_fstab: partition_files
 
 droidboot_modules := \
 	libc \
@@ -66,9 +66,6 @@ $(hide) $(foreach srcfile,$(droidboot_system_files), \
 )
 endef
 
-ifeq ($(droidboot_fstab),)
-  $(info No droidboot.fstab for TARGET_DEVICE $(TARGET_DEVICE))
-endif
 
 INTERNAL_DROIDBOOTIMAGE_ARGS := \
 	$(addprefix --second ,$(INSTALLED_2NDBOOTLOADER_TARGET)) \
@@ -98,8 +95,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemi
 		$(droidboot_watchdogd) \
 		$(droidboot_initrc) $(droidboot_kernel) \
 		$(droidboot_logcat) \
-		$(droidboot_build_prop) \
-		$(droidboot_fstab)
+		$(droidboot_build_prop)
 	@echo ----- Making droidboot image ------
 	rm -rf $(TARGET_DROIDBOOT_OUT)
 	mkdir -p $(TARGET_DROIDBOOT_OUT)
@@ -122,7 +118,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemi
 	-cp -f $(droidboot_modem_proxy_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/sbin/proxy >/dev/null 2>&1
 	cp -f $(droidboot_logcat) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/logcat
 	cp -rf $(droidboot_resources_common) $(TARGET_DROIDBOOT_ROOT_OUT)/
-	cp -f $(droidboot_fstab) $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/recovery.fstab
+	$(MKPARTITIONFILE)
 	cat $(INSTALLED_DEFAULT_PROP_TARGET) $(droidboot_build_prop) \
 	        > $(TARGET_DROIDBOOT_ROOT_OUT)/default.prop
 	$(hide) $(call droidboot-copy-files,$(TARGET_OUT),$(TARGET_DROIDBOOT_ROOT_OUT)/system/)
