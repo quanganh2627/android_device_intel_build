@@ -227,7 +227,7 @@ endif
 	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
 	$(hide) mkdir -p $(zip_root)/FIRMWARE
 ifeq ($(BOARD_HAVE_MODEM),true)
-	$(hide) find $(PRODUCT_OUT)/modem -exec zip -qj $(zip_root)/FIRMWARE/modem.zip {} \;
+	$(hide) find $(PRODUCT_OUT)/obj/ETC/modem_intermediates -exec zip -qj $(zip_root)/FIRMWARE/modem.zip {} \;
 endif
 	$(hide) find $(PRODUCT_OUT)/ifwi -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
 else
