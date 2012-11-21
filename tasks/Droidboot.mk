@@ -44,6 +44,7 @@ droidboot_modules := \
 	libext2_uuid \
 	libext2_profile \
 	libext4_utils \
+	libsparse \
 	libusbhost \
 	libz \
 	resize2fs \
