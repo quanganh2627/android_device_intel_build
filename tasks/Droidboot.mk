@@ -19,7 +19,6 @@ droidboot_modem_proxy_tool := $(call module-installed-files,proxy-recovery)
 
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
-droidboot_fstab: partition_files
 
 droidboot_modules := \
 	libc \
@@ -108,6 +107,8 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemi
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_DROIDBOOT_OUT)
 	rm $(TARGET_DROIDBOOT_ROOT_OUT)/init*.rc
 	echo Modifying ramdisk contents...
+	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
+	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab $(MKPARTITIONFILE)
 	cp -f $(droidboot_initrc) $(TARGET_DROIDBOOT_ROOT_OUT)/init.rc
 	if [ -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_PRODUCT).rc ]; then \
 	cp -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_PRODUCT).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
@@ -118,7 +119,6 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemi
 	-cp -f $(droidboot_modem_proxy_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/sbin/proxy >/dev/null 2>&1
 	cp -f $(droidboot_logcat) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/logcat
 	cp -rf $(droidboot_resources_common) $(TARGET_DROIDBOOT_ROOT_OUT)/
-	$(MKPARTITIONFILE)
 	cat $(INSTALLED_DEFAULT_PROP_TARGET) $(droidboot_build_prop) \
 	        > $(TARGET_DROIDBOOT_ROOT_OUT)/default.prop
 	$(hide) $(call droidboot-copy-files,$(TARGET_OUT),$(TARGET_DROIDBOOT_ROOT_OUT)/system/)
