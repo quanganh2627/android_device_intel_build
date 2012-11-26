@@ -6,7 +6,7 @@ DROIDBOOT_PATH := $(TOP)/bootable/droidboot
 
 INSTALLED_DROIDBOOTIMAGE_TARGET := $(PRODUCT_OUT)/droidboot.img
 
-droidboot_initrc := $(TARGET_DEVICE_DIR)/droidboot.init.rc
+droidboot_initrc := $(call get-specific-config-file ,droidboot.init.rc)
 droidboot_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
 droidboot_ramdisk := $(PRODUCT_OUT)/ramdisk-droidboot.img
 droidboot_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
