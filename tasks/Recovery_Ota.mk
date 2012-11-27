@@ -215,8 +215,7 @@ endif # !TARGET_MAKE_INTEL_BOOTIMAGE
 ifeq ($(TARGET_MAKE_INTEL_BOOTIMAGE),true)
 	$(hide) mkdir -p $(zip_root)/RECOVERY/RAMDISK/etc
 	$(hide) $(ACP) $(PRODUCT_OUT)/recovery.img $(zip_root)/RECOVERY/
-	$(hide) $(ACP) $(TARGET_RECOVERY_ROOT_OUT)/etc/recovery.fstab $(zip_root)/RECOVERY/RAMDISK/e
-	tc
+	$(hide) $(ACP) $(TARGET_RECOVERY_ROOT_OUT)/etc/recovery.fstab $(zip_root)/RECOVERY/RAMDISK/etc
 ifeq ($(TARGET_USE_DROIDBOOT),true)
 	$(hide) $(ACP) $(PRODUCT_OUT)/droidboot.img $(zip_root)/RECOVERY/
 endif
