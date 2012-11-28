@@ -13,15 +13,9 @@ droidboot_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
 droidboot_binary := $(call intermediates-dir-for,EXECUTABLES,droidboot)/droidboot
 droidboot_watchdogd := $(call intermediates-dir-for,EXECUTABLES,watchdogd)/watchdogd
 
-ifeq ($(shell test -d $(ANDROID_BUILD_TOP)/$(call intermediates-dir-for,EXECUTABLES,cmfwdl-app) && echo YES), YES)
-droidboot_modem_download_tool :=  $(call intermediates-dir-for,EXECUTABLES,cmfwdl-app)/cmfwdl-app
-ifeq ($(shell test -d $(ANDROID_BUILD_TOP)/$(call intermediates-dir-for,EXECUTABLES,proxy-recovery) && echo YES), YES)
-droidboot_modem_proxy_tool := $(call intermediates-dir-for,EXECUTABLES,proxy-recovery)/proxy-recovery
-else
-droidboot_modem_download_tool :=
-droidboot_modem_proxy_tool :=
-endif
-endif
+# Look for output file. Build system before droidboot. Copy the files if they exist.
+droidboot_modem_download_tool := $(call module-installed-files,cmfwdl-app)
+droidboot_modem_proxy_tool := $(call module-installed-files,proxy-recovery)
 
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
@@ -96,14 +90,12 @@ ifdef BOARD_KERNEL_PAGESIZE
   INTERNAL_DROIDBOOTIMAGE_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
 endif
 
-$(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
+$(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemimg_gz\
 		$(INSTALLED_RAMDISK_TARGET) \
 		$(INSTALLED_BOOTIMAGE_TARGET) \
 		$(droidboot_system_files) \
 		$(droidboot_binary) \
 		$(droidboot_watchdogd) \
-		$(droidboot_modem_download_tool) \
-		$(droidboot_modem_proxy_tool) \
 		$(droidboot_initrc) $(droidboot_kernel) \
 		$(droidboot_logcat) \
 		$(droidboot_build_prop) \
@@ -126,12 +118,8 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	fi
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
-ifeq ($(shell test -d $(ANDROID_BUILD_TOP)/$(call intermediates-dir-for,EXECUTABLES,cmfwdl-app) && echo YES), YES)
-	cp -f $(droidboot_modem_download_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
-ifeq ($(shell test -d $(ANDROID_BUILD_TOP)/$(call intermediates-dir-for,EXECUTABLES,proxy-recovery) && echo YES), YES)
-	cp -f $(droidboot_modem_proxy_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/sbin/proxy
-endif
-endif
+	-cp -f $(droidboot_modem_download_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/ >/dev/null 2>&1
+	-cp -f $(droidboot_modem_proxy_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/sbin/proxy >/dev/null 2>&1
 	cp -f $(droidboot_logcat) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/logcat
 	cp -rf $(droidboot_resources_common) $(TARGET_DROIDBOOT_ROOT_OUT)/
 	cp -f $(droidboot_fstab) $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/recovery.fstab
