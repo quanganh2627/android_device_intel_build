@@ -11,7 +11,7 @@ droidboot_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
 droidboot_ramdisk := $(PRODUCT_OUT)/ramdisk-droidboot.img
 droidboot_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
 droidboot_binary := $(call intermediates-dir-for,EXECUTABLES,droidboot)/droidboot
-droidboot_watchdogd := $(call intermediates-dir-for,EXECUTABLES,watchdogd)/watchdogd
+droidboot_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_watchdogd
 
 # Look for output file. Build system before droidboot. Copy the files if they exist.
 droidboot_modem_download_tool := $(call module-installed-files,cmfwdl-app)
