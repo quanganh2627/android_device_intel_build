@@ -131,7 +131,7 @@ endif # TARGET_MAKE_NO_DEFAULT_RECOVERY
 
 ifeq ($(TARGET_MAKE_NO_DEFAULT_OTA_PACKAGE),true)
 
-name := $(TARGET_DEVICE)
+name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
 endif
@@ -297,7 +297,7 @@ ifneq ($(TARGET_NO_KERNEL),true)
 # -----------------------------------------------------------------
 # OTA update package
 
-name := $(TARGET_DEVICE)
+name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
 endif
@@ -322,7 +322,7 @@ otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 # -----------------------------------------------------------------
 # The update package
 
-name := $(TARGET_DEVICE)
+name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
 endif
