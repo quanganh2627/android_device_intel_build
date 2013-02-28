@@ -33,8 +33,7 @@ bootimage: $(PRODUCT_OUT)/root/fstab.$(TARGET_DEVICE) $(PRODUCT_OUT)/root/fstab.
 
 blank_flashfiles: $(PRODUCT_OUT)/partition.tbl
 
-
-droidbootimage: $(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE) $(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab
+droidbootimage: $(PRODUCT_OUT)/partition.tbl $(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE) $(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab
 # droidboot fstab
 ifeq ($(TARGET_USE_DROIDBOOT),true)
 
