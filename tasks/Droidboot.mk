@@ -72,7 +72,12 @@ INTERNAL_DROIDBOOTIMAGE_ARGS := \
 	--ramdisk $(droidboot_ramdisk)
 
 INTERNAL_DROIDBOOTIMAGE_ARGS += --product $(TARGET_DEVICE)
-INTERNAL_DROIDBOOTIMAGE_ARGS += --type droidboot
+# Allow board to overwrite the type used for droid boot image
+ifdef DROIDBOOT_OS_TYPE
+  INTERNAL_DROIDBOOTIMAGE_ARGS += --type $(DROIDBOOT_OS_TYPE)
+else
+  INTERNAL_DROIDBOOTIMAGE_ARGS += --type droidboot
+endif
 
 # Assumes this has already been stripped
 ifdef BOARD_KERNEL_CMDLINE
@@ -109,6 +114,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemi
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab $(MKPARTITIONFILE)
+	cp -f $(PRODUCT_OUT)/partition.tbl $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/
 	cp -f $(droidboot_initrc) $(TARGET_DROIDBOOT_ROOT_OUT)/init.rc
 	if [ -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_PRODUCT).rc ]; then \
 	cp -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_PRODUCT).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
