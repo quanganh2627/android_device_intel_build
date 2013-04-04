@@ -48,6 +48,7 @@ droidboot_modules := \
 	gzip \
 	kexec \
 	droidboot \
+	partlink \
 
 ifneq ($(call intel-target-need-intel-libraries),)
 droidboot_modules += libimf libintlc libsvml
