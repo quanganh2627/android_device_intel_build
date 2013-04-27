@@ -15,7 +15,6 @@ droidboot_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia
 
 # Look for output file. Build system before droidboot. Copy the files if they exist.
 droidboot_modem_download_tool := $(call module-installed-files,cmfwdl-app)
-droidboot_modem_proxy_tool := $(call module-installed-files,proxy-recovery)
 
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
@@ -48,6 +47,7 @@ droidboot_modules := \
 	gzip \
 	kexec \
 	droidboot \
+	partlink \
 
 ifneq ($(call intel-target-need-intel-libraries),)
 droidboot_modules += libimf libintlc libsvml
@@ -122,7 +122,6 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemi
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	-cp -f $(droidboot_modem_download_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/ >/dev/null 2>&1
-	-cp -f $(droidboot_modem_proxy_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/sbin/proxy >/dev/null 2>&1
 	cp -f $(droidboot_logcat) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/logcat
 	cp -rf $(droidboot_resources_common) $(TARGET_DROIDBOOT_ROOT_OUT)/
 	cat $(INSTALLED_DEFAULT_PROP_TARGET) $(droidboot_build_prop) \

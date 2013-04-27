@@ -25,7 +25,8 @@ recovery_modules := \
 	liblog \
 	libm \
 	libstdc++ \
-	libusbhost
+	libusbhost \
+	partlink
 
 recovery_system_files := $(call module-installed-files,$(recovery_modules))
 define recovery-copy-files
