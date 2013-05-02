@@ -107,6 +107,9 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/etc/recovery.fstab $(MKPARTITIONFILE)
 	cp -f $(recovery_initrc) $(TARGET_RECOVERY_ROOT_OUT)/init.rc
+	if [ -f $(RECOVERY_DEBUG_PATH)/init.recovery.debug.rc ]; then \
+	cp -f $(RECOVERY_DEBUG_PATH)/init.recovery.debug.rc $(TARGET_RECOVERY_ROOT_OUT); \
+	fi
 	if [ -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_DEVICE).rc ]; then \
 	cp -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_DEVICE).rc $(TARGET_RECOVERY_ROOT_OUT); \
 	fi
