@@ -47,7 +47,7 @@ INTERNAL_RECOVERYIMAGE_ARGS := \
 	--kernel $(recovery_kernel) \
 	--ramdisk $(recovery_ramdisk)
 
-INTERNAL_RECOVERYIMAGE_ARGS += --product $(TARGET_DEVICE)
+INTERNAL_RECOVERYIMAGE_ARGS += --product $(REF_DEVICE_NAME)
 INTERNAL_RECOVERYIMAGE_ARGS += --type recovery
 
 # Assumes this has already been stripped

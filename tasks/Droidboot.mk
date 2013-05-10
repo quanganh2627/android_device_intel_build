@@ -71,7 +71,7 @@ INTERNAL_DROIDBOOTIMAGE_ARGS := \
 	--kernel $(droidboot_kernel) \
 	--ramdisk $(droidboot_ramdisk)
 
-INTERNAL_DROIDBOOTIMAGE_ARGS += --product $(TARGET_DEVICE)
+INTERNAL_DROIDBOOTIMAGE_ARGS += --product $(REF_DEVICE_NAME)
 # Allow board to overwrite the type used for droid boot image
 ifdef DROIDBOOT_OS_TYPE
   INTERNAL_DROIDBOOTIMAGE_ARGS += --type $(DROIDBOOT_OS_TYPE)
