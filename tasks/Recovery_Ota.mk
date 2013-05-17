@@ -47,7 +47,7 @@ INTERNAL_RECOVERYIMAGE_ARGS := \
 	--kernel $(recovery_kernel) \
 	--ramdisk $(recovery_ramdisk)
 
-INTERNAL_RECOVERYIMAGE_ARGS += --product $(TARGET_DEVICE)
+INTERNAL_RECOVERYIMAGE_ARGS += --product $(REF_DEVICE_NAME)
 INTERNAL_RECOVERYIMAGE_ARGS += --type recovery
 
 # Assumes this has already been stripped
@@ -100,6 +100,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	echo Copying baseline ramdisk...
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_RECOVERY_OUT)
 	rm $(TARGET_RECOVERY_ROOT_OUT)/init*.rc
+	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_RECOVERY_OUT)/root/
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/etc/recovery.fstab $(MKPARTITIONFILE)
