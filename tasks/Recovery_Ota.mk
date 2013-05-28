@@ -263,6 +263,12 @@ endif # TARGET_MAKE_INTEL_BOOTIMAGE
 	$(hide) mkdir -p $(zip_root)/OTA/bin
 	$(hide) $(ACP) $(INSTALLED_ANDROID_INFO_TXT_TARGET) $(zip_root)/OTA/
 	$(hide) $(ACP) $(PRIVATE_OTA_TOOLS) $(zip_root)/OTA/bin/
+ifeq ($(BOARD_HAS_CAPSULE),true)
+	$(ACP) $(CAPSULE_BINARY) $(zip_root)/FIRMWARE/capsule.bin
+endif
+ifeq ($(BOARD_HAS_ULPMC),true)
+	$(ACP) $(ULPMC_BINARY) $(zip_root)/FIRMWARE/ulpmc.bin
+endif
 	@# Files that do not end up in any images, but are necessary to
 	@# build them.
 	$(hide) mkdir -p $(zip_root)/META
@@ -303,6 +309,12 @@ ifneq ($(TARGET_NO_KERNEL),true)
 # -----------------------------------------------------------------
 # OTA update package
 
+ifeq ($(BOARD_HAS_CAPSULE),true)
+  EXTRA_OTA_GEN_OPTIONS += --intel_capsule
+endif
+ifeq ($(BOARD_HAS_ULPMC),true)
+  EXTRA_OTA_GEN_OPTIONS += --intel_ulpmc
+endif
 name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
@@ -320,6 +332,7 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS) $(SEL
 	   -p $(HOST_OUT) \
 	   -k $(KEY_CERT_PAIR) \
 	   --no_prereq \
+	   $(EXTRA_OTA_GEN_OPTIONS) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
 .PHONY: otapackage
