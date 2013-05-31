@@ -109,6 +109,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemi
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/mnt/sdcard
+	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin
 	echo Copying baseline ramdisk...
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_DROIDBOOT_OUT)
 	rm $(TARGET_DROIDBOOT_ROOT_OUT)/init*.rc
@@ -122,7 +123,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemi
 	cp -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_PRODUCT).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
 	fi
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
-	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
+	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin/
 	-cp -f $(droidboot_modem_download_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/ >/dev/null 2>&1
 	cp -f $(droidboot_logcat) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/logcat
 	cp -rf $(droidboot_resources_common) $(TARGET_DROIDBOOT_ROOT_OUT)/
