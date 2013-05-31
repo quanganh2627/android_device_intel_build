@@ -1,5 +1,5 @@
-DEFAULT_PARTITION := $(TOP)/vendor/intel/common/storage/default_partition.json
-DEFAULT_MOUNT := $(TOP)/vendor/intel/common/storage/default_mount.json
+DEFAULT_PARTITION := $(TOP)/device/intel/common/storage/default_partition.json
+DEFAULT_MOUNT := $(TOP)/device/intel/common/storage/default_mount.json
 PART_MOUNT_OVERRIDE_FILE := $(call get-specific-config-file ,storage/part_mount_override.json)
 PART_MOUNT_OVERRIDE_FILES := $(call get-all-config-files ,storage/part_mount_override.json)
 PART_MOUNT_OUT := $(PRODUCT_OUT)
