@@ -12,10 +12,6 @@ droidboot_ramdisk := $(PRODUCT_OUT)/ramdisk-droidboot.img
 droidboot_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
 droidboot_binary := $(call intermediates-dir-for,EXECUTABLES,droidboot)/droidboot
 droidboot_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_watchdogd
-
-# Look for output file. Build system before droidboot. Copy the files if they exist.
-droidboot_modem_download_tool := $(call module-installed-files,cmfwdl-app)
-
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
 
@@ -92,7 +88,7 @@ ifdef BOARD_KERNEL_PAGESIZE
   INTERNAL_DROIDBOOTIMAGE_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
 endif
 
-$(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemimg_gz\
+$(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(INSTALLED_RAMDISK_TARGET) \
 		$(INSTALLED_BOOTIMAGE_TARGET) \
 		$(droidboot_system_files) \
@@ -124,7 +120,6 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) systemi
 	fi
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin/
-	-cp -f $(droidboot_modem_download_tool) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/ >/dev/null 2>&1
 	cp -f $(droidboot_logcat) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/logcat
 	cp -rf $(droidboot_resources_common) $(TARGET_DROIDBOOT_ROOT_OUT)/
 	cat $(INSTALLED_DEFAULT_PROP_TARGET) $(droidboot_build_prop) \
