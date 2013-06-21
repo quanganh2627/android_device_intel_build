@@ -46,6 +46,18 @@ droidboot_modules := \
 	droidboot \
 	partlink \
 
+ifeq ($(TARGET_BOARD_PLATFORM), clovertrail)
+droidboot_pvrsrvctl := $(PRODUCT_OUT)/system/vendor/bin/pvrsrvctl
+
+droidboot_modules += \
+	libdrm \
+	libhardware \
+	libsrv_init \
+	libsrv_um \
+	pvrsrvctl \
+	shisp_css15.bin
+endif
+
 ifneq ($(call intel-target-need-intel-libraries),)
 droidboot_modules += libimf libintlc libsvml
 endif
@@ -121,6 +133,9 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin/
 	cp -f $(droidboot_logcat) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/logcat
+ifeq ($(TARGET_BOARD_PLATFORM), clovertrail)
+	cp -f $(droidboot_pvrsrvctl) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
+endif
 	cp -rf $(droidboot_resources_common) $(TARGET_DROIDBOOT_ROOT_OUT)/
 	cat $(INSTALLED_DEFAULT_PROP_TARGET) $(droidboot_build_prop) \
 	        > $(TARGET_DROIDBOOT_ROOT_OUT)/default.prop
