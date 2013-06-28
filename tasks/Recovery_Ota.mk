@@ -11,6 +11,7 @@ recovery_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
 recovery_binary := $(call intermediates-dir-for,EXECUTABLES,recovery)/recovery
 recovery_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat_static)/logcat_static
 recovery_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_watchdogd
+recovery_thermal_rosd := $(call intermediates-dir-for,EXECUTABLES,thermald)/thermald
 recovery_resources_common := $(call include-path-for, recovery)/res
 recovery_resources_private := $(strip $(wildcard $(TARGET_DEVICE_DIR)/recovery/res))
 recovery_resource_deps := $(shell find $(recovery_resources_common) \
@@ -85,6 +86,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 		$(INSTALLED_BOOTIMAGE_TARGET) \
 		$(recovery_binary) \
 		$(recovery_watchdogd) \
+		$(recovery_thermal_rosd) \
 		$(recovery_initrc) $(recovery_kernel) \
 		$(recovery_logcat) \
 		$(INSTALLED_2NDBOOTLOADER_TARGET) \
@@ -105,11 +107,12 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/etc/recovery.fstab $(MKPARTITIONFILE)
 	cp -f $(recovery_initrc) $(TARGET_RECOVERY_ROOT_OUT)/init.rc
-	if [ -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_PRODUCT).rc ]; then \
-	cp -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_PRODUCT).rc $(TARGET_RECOVERY_ROOT_OUT); \
+	if [ -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_DEVICE).rc ]; then \
+	cp -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_DEVICE).rc $(TARGET_RECOVERY_ROOT_OUT); \
 	fi
 	cp -f $(recovery_binary) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
 	cp -f $(recovery_watchdogd) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
+	cp -f $(recovery_thermal_rosd) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
 	$(hide) $(call recovery-copy-files,$(TARGET_OUT),$(TARGET_RECOVERY_ROOT_OUT)/system/)
 	cp -f $(recovery_logcat) $(TARGET_RECOVERY_ROOT_OUT)/sbin/logcat
 	cp -rf $(recovery_resources_common) $(TARGET_RECOVERY_ROOT_OUT)/
@@ -119,7 +122,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	cat $(INSTALLED_DEFAULT_PROP_TARGET) $(recovery_build_prop) \
 	        > $(TARGET_RECOVERY_ROOT_OUT)/default.prop
 	$(MKBOOTFS) $(TARGET_RECOVERY_ROOT_OUT) | $(MINIGZIP) > $(recovery_ramdisk)
-	$(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_RECOVERYIMAGE_ARGS) --output $@
+	$(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_RECOVERYIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS)
 	@echo ----- Made recovery image -------- $@
 	$(hide) $(call assert-max-image-size,$@,$(BOARD_RECOVERYIMAGE_PARTITION_SIZE),raw)
 else

@@ -127,8 +127,8 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab $(MKPARTITIONFILE)
 	cp -f $(PRODUCT_OUT)/partition.tbl $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/
 	cp -f $(droidboot_initrc) $(TARGET_DROIDBOOT_ROOT_OUT)/init.rc
-	if [ -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_PRODUCT).rc ]; then \
-	cp -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_PRODUCT).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
+	if [ -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_DEVICE).rc ]; then \
+	cp -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_DEVICE).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
 	fi
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin/
@@ -141,7 +141,7 @@ endif
 	        > $(TARGET_DROIDBOOT_ROOT_OUT)/default.prop
 	$(hide) $(call droidboot-copy-files,$(TARGET_OUT),$(TARGET_DROIDBOOT_ROOT_OUT)/system/)
 	$(MKBOOTFS) $(TARGET_DROIDBOOT_ROOT_OUT) | $(MINIGZIP) > $(droidboot_ramdisk)
-	$(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_DROIDBOOTIMAGE_ARGS) --output $@
+	$(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_DROIDBOOTIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS)
 	@echo ----- Made droidboot image -------- $@
 
 else
