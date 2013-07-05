@@ -337,6 +337,11 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS) $(SEL
 	   --no_prereq \
 	   $(EXTRA_OTA_GEN_OPTIONS) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
+ifneq (, $(findstring next, $(TARGET_PRODUCT)))
+	$(hide) echo "Moving $@ to $(subst _next,,$@)"
+	$(hide) echo "for publish_build.py script to process this sub-category platform $(TARGET_PRODUCT) of the parent platform $(TARGET_DEVICE)"
+	$(hide) mv $@ $(subst _next,,$@)
+endif
 
 .PHONY: otapackage
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)

@@ -127,6 +127,9 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab $(MKPARTITIONFILE)
 	cp -f $(PRODUCT_OUT)/partition.tbl $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/
 	cp -f $(droidboot_initrc) $(TARGET_DROIDBOOT_ROOT_OUT)/init.rc
+	if [ -f $(DROIDBOOT_DEBUG_PATH)/init.droidboot.debug.rc ]; then \
+	cp -f $(DROIDBOOT_DEBUG_PATH)/init.droidboot.debug.rc $(TARGET_DROIDBOOT_ROOT_OUT); \
+	fi
 	if [ -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_DEVICE).rc ]; then \
 	cp -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_DEVICE).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
 	fi
