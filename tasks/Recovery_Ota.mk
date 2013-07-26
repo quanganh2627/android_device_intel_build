@@ -321,6 +321,9 @@ endif
 ifeq ($(BOARD_HAS_ULPMC),true)
   EXTRA_OTA_GEN_OPTIONS += --intel_ulpmc
 endif
+ifeq ($(BOARD_HAVE_MODEM),false)
+  EXTRA_OTA_GEN_OPTIONS += --no_modem
+endif
 name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
