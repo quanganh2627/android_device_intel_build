@@ -30,7 +30,12 @@ $(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE): $(DEFAULT_PARTITION) $(DEFAU
 	$(hide)mkdir -p $(dir $@)
 	PART_MOUNT_OUT_FILE=$@	$(MKPARTITIONFILE)
 
-bootimage: $(PRODUCT_OUT)/partition.tbl $(PRODUCT_OUT)/root/fstab.$(TARGET_DEVICE) $(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE)
+# android ramconsole fstab
+$(PRODUCT_OUT)/root/fstab.ramconsole.$(TARGET_DEVICE): $(DEFAULT_PARTITION) $(DEFAULT_MOUNT) $(PART_MOUNT_OVERRIDE_FILES)
+	$(hide)mkdir -p $(dir $@)
+	PART_MOUNT_OUT_FILE=$@	$(MKPARTITIONFILE)
+
+bootimage: $(PRODUCT_OUT)/partition.tbl $(PRODUCT_OUT)/root/fstab.$(TARGET_DEVICE) $(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE) $(PRODUCT_OUT)/root/fstab.ramconsole.$(TARGET_DEVICE)
 
 blank_flashfiles: $(PRODUCT_OUT)/partition.tbl
 
