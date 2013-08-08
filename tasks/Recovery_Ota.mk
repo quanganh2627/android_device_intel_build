@@ -270,7 +270,7 @@ endif # TARGET_MAKE_INTEL_BOOTIMAGE
 	$(hide) $(ACP) $(INSTALLED_ANDROID_INFO_TXT_TARGET) $(zip_root)/OTA/
 	$(hide) $(ACP) $(PRIVATE_OTA_TOOLS) $(zip_root)/OTA/bin/
 ifeq ($(BOARD_HAS_CAPSULE),true)
-	$(ACP) $(CAPSULE_BINARY) $(zip_root)/FIRMWARE/capsule.bin
+	$(ACP) $(IFWI_PREBUILT_PATHS)/capsule.bin $(zip_root)/FIRMWARE/capsule.bin
 endif
 ifeq ($(BOARD_HAS_ULPMC),true)
 	$(ACP) $(ULPMC_BINARY) $(zip_root)/FIRMWARE/ulpmc.bin
