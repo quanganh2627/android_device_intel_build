@@ -271,7 +271,7 @@ endif # TARGET_MAKE_INTEL_BOOTIMAGE
 	$(hide) $(ACP) $(INSTALLED_ANDROID_INFO_TXT_TARGET) $(zip_root)/OTA/
 	$(hide) $(ACP) $(PRIVATE_OTA_TOOLS) $(zip_root)/OTA/bin/
 ifeq ($(BOARD_HAS_CAPSULE),true)
-	$(ACP) $(CAPSULE_BINARY) $(zip_root)/FIRMWARE/capsule.bin
+	$(ACP) $(IFWI_PREBUILT_PATHS)/capsule.bin $(zip_root)/FIRMWARE/capsule.bin
 endif
 ifeq ($(BOARD_HAS_ULPMC),true)
 	$(ACP) $(ULPMC_BINARY) $(zip_root)/FIRMWARE/ulpmc.bin
@@ -345,11 +345,6 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS) $(SEL
 	   --no_prereq \
 	   $(EXTRA_OTA_GEN_OPTIONS) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
-ifneq (, $(findstring next, $(TARGET_PRODUCT)))
-	$(hide) echo "Moving $@ to $(subst _next,,$@)"
-	$(hide) echo "for publish_build.py script to process this sub-category platform $(TARGET_PRODUCT) of the parent platform $(TARGET_DEVICE)"
-	$(hide) mv $@ $(subst _next,,$@)
-endif
 
 .PHONY: otapackage
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
