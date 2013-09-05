@@ -12,9 +12,9 @@ INSTALLED_ESPIMAGE_TARGET := $(BUILT_ESPIMAGE_TARGET)
 $(BUILD_ESPIMAGE_DIR):
 	$(hide) mkdir -p $(BUILD_ESPIMAGE_DIR)
 
-$(INSTALLED_ESPIMAGE_TARGET): $(BUILD_ESPIMAGE_DIR) efilinux
+$(INSTALLED_ESPIMAGE_TARGET): $(BUILD_ESPIMAGE_DIR) efilinux | $(HOST_OUT_EXECUTABLES)/mcopy
 	$(call pretty,"Target ESP image: $@")
-	$(hide) $(TOP)/vendor/intel/support/make_vfatfs "ESP" \
+	$(hide) vendor/intel/support/make_vfatfs "ESP" \
 		$(BUILT_ESPIMAGE_TARGET) \
 		$(shell python -c 'import json; print json.load(open("'$(PART_MOUNT_OVERRIDE_FILE)'"))["partitions"]["ESP"]["size"]') \
 		$(PRODUCT_OUT)/esp
