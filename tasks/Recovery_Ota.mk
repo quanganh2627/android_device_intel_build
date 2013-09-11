@@ -191,6 +191,7 @@ $(BUILT_TARGET_FILES_PACKAGE): \
 		$(built_ota_tools) \
 		$(APKCERTS_FILE) \
 		$(HOST_OUT_EXECUTABLES)/fs_config \
+		firmware \
 		| $(ACP)
 	@echo "Package target files: $@"
 	$(hide) rm -rf $@ $(zip_root)

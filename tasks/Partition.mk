@@ -30,22 +30,8 @@ $(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE): $(DEFAULT_PARTITION) $(DEFAU
 	$(hide)mkdir -p $(dir $@)
 	PART_MOUNT_OUT_FILE=$@	$(MKPARTITIONFILE)
 
-bootimage: $(PRODUCT_OUT)/partition.tbl $(PRODUCT_OUT)/root/fstab.$(TARGET_DEVICE) $(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE)
+$(BUILT_RAMDISK_TARGET): \
+	$(PRODUCT_OUT)/root/fstab.$(TARGET_DEVICE) \
+	$(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE)
 
 blank_flashfiles: $(PRODUCT_OUT)/partition.tbl
-
-droidbootimage: $(PRODUCT_OUT)/partition.tbl $(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE) $(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab
-
-# droidboot fstab
-ifeq ($(TARGET_USE_DROIDBOOT),true)
-
-$(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE): $(DEFAULT_PARTITION) $(DEFAULT_MOUNT) $(PART_MOUNT_OVERRIDE_FILES) $(INSTALLED_DROIDBOOTIMAGE_TARGET)
-	$(hide)mkdir -p $(dir $@)
-	PART_MOUNT_OUT_FILE=$@	$(MKPARTITIONFILE)
-
-$(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab: $(DEFAULT_PARTITION) $(DEFAULT_MOUNT) $(PART_MOUNT_OVERRIDE_FILES) $(INSTALLED_DROIDBOOTIMAGE_TARGET)
-	$(hide)mkdir -p $(dir $@)
-	PART_MOUNT_OUT_FILE=$@	$(MKPARTITIONFILE)
-
-endif
-

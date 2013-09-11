@@ -111,7 +111,8 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(droidboot_initrc_next) \
 		$(droidboot_kernel) \
 		$(droidboot_logcat) \
-		$(droidboot_build_prop)
+		$(droidboot_build_prop) \
+		$(PRODUCT_OUT)/partition.tbl
 	@echo ----- Making droidboot image ------
 	rm -rf $(TARGET_DROIDBOOT_OUT)
 	mkdir -p $(TARGET_DROIDBOOT_OUT)
