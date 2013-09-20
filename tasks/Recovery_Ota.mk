@@ -228,13 +228,6 @@ ifeq ($(TARGET_USE_DROIDBOOT),true)
 endif
 	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
 	$(hide) mkdir -p $(zip_root)/FIRMWARE
-ifeq ($(BOARD_HAVE_MODEM),true)
-ifeq ($(BOARD_MODEM_FLASHLESS),true)
-	$(hide) cp $(PRODUCT_OUT)/system/etc/firmware/modem/modem_flashless.zip $(zip_root)/FIRMWARE/modem.zip
-else
-	$(hide) find $(PRODUCT_OUT)/obj/ETC/modem_intermediates -exec zip -qj $(zip_root)/FIRMWARE/modem.zip {} \;
-endif
-endif
 	$(hide) find $(PRODUCT_OUT)/ifwi -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
 else
 	$(hide) $(call package_files-copy-root, \
