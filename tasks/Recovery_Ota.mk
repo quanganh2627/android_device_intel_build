@@ -88,7 +88,8 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 		$(recovery_binary) \
 		$(recovery_watchdogd) \
 		$(recovery_thermal_rosd) \
-		$(recovery_initrc) $(recovery_kernel) \
+		$(recovery_initrc) \
+		$(recovery_kernel) \
 		$(recovery_logcat) \
 		$(INSTALLED_2NDBOOTLOADER_TARGET) \
 		$(recovery_build_prop) $(recovery_resource_deps) \
@@ -191,6 +192,7 @@ $(BUILT_TARGET_FILES_PACKAGE): \
 		$(built_ota_tools) \
 		$(APKCERTS_FILE) \
 		$(HOST_OUT_EXECUTABLES)/fs_config \
+		firmware \
 		| $(ACP)
 	@echo "Package target files: $@"
 	$(hide) rm -rf $@ $(zip_root)
@@ -228,13 +230,6 @@ ifeq ($(TARGET_USE_DROIDBOOT),true)
 endif
 	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
 	$(hide) mkdir -p $(zip_root)/FIRMWARE
-ifeq ($(BOARD_HAVE_MODEM),true)
-ifeq ($(BOARD_MODEM_FLASHLESS),true)
-	$(hide) cp $(PRODUCT_OUT)/system/etc/firmware/modem/modem_flashless.zip $(zip_root)/FIRMWARE/modem.zip
-else
-	$(hide) find $(PRODUCT_OUT)/obj/ETC/modem_intermediates -exec zip -qj $(zip_root)/FIRMWARE/modem.zip {} \;
-endif
-endif
 	$(hide) find $(PRODUCT_OUT)/ifwi -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
 else
 	$(hide) $(call package_files-copy-root, \

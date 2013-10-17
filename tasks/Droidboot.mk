@@ -7,7 +7,6 @@ DROIDBOOT_PATH := $(TOP)/bootable/droidboot
 INSTALLED_DROIDBOOTIMAGE_TARGET := $(PRODUCT_OUT)/droidboot.img
 
 droidboot_initrc := $(call get-specific-config-file ,droidboot.init.rc)
-droidboot_initrc_next := $(call get-specific-config-file ,droidboot_next.init.rc)
 droidboot_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
 droidboot_ramdisk := $(PRODUCT_OUT)/ramdisk-droidboot.img
 droidboot_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
@@ -108,10 +107,10 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(droidboot_binary) \
 		$(droidboot_watchdogd) \
 		$(droidboot_initrc) \
-		$(droidboot_initrc_next) \
 		$(droidboot_kernel) \
 		$(droidboot_logcat) \
-		$(droidboot_build_prop)
+		$(droidboot_build_prop) \
+		$(PRODUCT_OUT)/partition.tbl
 	@echo ----- Making droidboot image ------
 	rm -rf $(TARGET_DROIDBOOT_OUT)
 	mkdir -p $(TARGET_DROIDBOOT_OUT)
@@ -130,9 +129,6 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab $(MKPARTITIONFILE)
 	cp -f $(PRODUCT_OUT)/partition.tbl $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/
 	cp -f $(droidboot_initrc) $(TARGET_DROIDBOOT_ROOT_OUT)/init.rc
-ifneq (,$(filter %_next, $(TARGET_PRODUCT)))
-	cp -f $(droidboot_initrc_next) $(TARGET_DROIDBOOT_ROOT_OUT)/droidboot.init.next.rc
-endif
 	if [ -f $(DROIDBOOT_DEBUG_PATH)/init.droidboot.debug.rc ]; then \
 	cp -f $(DROIDBOOT_DEBUG_PATH)/init.droidboot.debug.rc $(TARGET_DROIDBOOT_ROOT_OUT); \
 	fi
