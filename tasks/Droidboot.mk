@@ -6,6 +6,10 @@ DROIDBOOT_PATH := $(TOP)/bootable/droidboot
 
 INSTALLED_DROIDBOOTIMAGE_TARGET := $(PRODUCT_OUT)/droidboot.img
 
+iago_base := $(PRODUCT_OUT)/iago$
+DROIDBOOT_BOOTIMAGE := $(iago_base)/droidboot.img$
+MKBOOTIMG_BIN := out/host/linux-x86/bin/mkbootimg
+
 droidboot_initrc := $(call get-specific-config-file ,droidboot.init.rc)
 droidboot_initrc_next := $(call get-specific-config-file ,droidboot_next.init.rc)
 droidboot_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
@@ -89,6 +93,8 @@ else
   INTERNAL_DROIDBOOTIMAGE_ARGS += --type droidboot
 endif
 
+BOARD_KERNEL_CMDLINE_DROIDBOOT := console=ttyS0,115200 console=logk0 drm.debug=0x0 kmemleak=off androidboot.bootmedia=$(BOARD_BOOTMEDIA) androidboot.boardid=129 androidboot.hardware=$(TARGET_DEVICE) $(cmdline_extra)
+
 # Assumes this has already been stripped
 ifdef BOARD_KERNEL_CMDLINE
   INTERNAL_DROIDBOOTIMAGE_ARGS += --cmdline "$(BOARD_KERNEL_CMDLINE) $(BOARD_KERNEL_DROIDBOOT_EXTRA_CMDLINE)"
@@ -157,5 +163,20 @@ else
 INSTALLED_DROIDBOOTIMAGE_TARGET :=
 endif
 
+#generate the UEFI compatible droidboot.img
+$(DROIDBOOT_BOOTIMAGE): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
+		$(INSTALLED_RAMDISK_TARGET) \
+		$(INSTALLED_BOOTIMAGE_TARGET) \
+		$(INSTALLED_DROIDBOOTIMAGE_TARGET) \
+		$(MKBOOTIMG_BIN) \
+
+	$(hide) $(MKBOOTIMG_BIN) --kernel $(droidboot_kernel) \
+			--ramdisk $(droidboot_ramdisk)\
+			--cmdline "$(BOARD_KERNEL_CMDLINE_DROIDBOOT) $(BOARD_KERNEL_DROIDBOOT_EXTRA_CMDLINE)" \
+			--base $(BOARD_KERNEL_BASE) \
+			--pagesize $(BOARD_KERNEL_PAGESIZE) \
+			--output $@
+
 .PHONY: droidbootimage
 droidbootimage: $(INSTALLED_DROIDBOOTIMAGE_TARGET)
+droidbootimage: $(DROIDBOOT_BOOTIMAGE)
