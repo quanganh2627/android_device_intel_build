@@ -49,8 +49,10 @@ INTERNAL_RECOVERYIMAGE_ARGS := \
 	--kernel $(recovery_kernel) \
 	--ramdisk $(recovery_ramdisk)
 
-INTERNAL_RECOVERYIMAGE_ARGS += --product $(REF_DEVICE_NAME)
-INTERNAL_RECOVERYIMAGE_ARGS += --type recovery
+ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE),true)
+  INTERNAL_RECOVERYIMAGE_ARGS += --product $(REF_DEVICE_NAME)
+  INTERNAL_RECOVERYIMAGE_ARGS += --type recovery
+endif
 
 # Assumes this has already been stripped
 ifdef BOARD_KERNEL_CMDLINE
