@@ -223,9 +223,9 @@ ifeq ($(TARGET_MAKE_INTEL_BOOTIMAGE),true)
 	$(hide) $(ACP) $(PRODUCT_OUT)/recovery.img $(zip_root)/RECOVERY/
 	$(hide) $(ACP) $(TARGET_RECOVERY_ROOT_OUT)/etc/recovery.fstab $(zip_root)/RECOVERY/RAMDISK/etc
 ifeq ($(TARGET_USE_DROIDBOOT),true)
-	$(hide) $(ACP) $(PRODUCT_OUT)/droidboot.img $(zip_root)/RECOVERY/
+	$(hide) $(ACP) $(PRODUCT_OUT)/iago/droidboot.img $(zip_root)/RECOVERY/
 endif
-	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
+	$(hide) $(ACP) $(PRODUCT_OUT)/iago/boot.img $(zip_root)/BOOT/
 	$(hide) mkdir -p $(zip_root)/FIRMWARE
 ifeq ($(BOARD_HAVE_MODEM),true)
 ifeq ($(BOARD_MODEM_FLASHLESS),true)
