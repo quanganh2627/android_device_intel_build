@@ -45,6 +45,16 @@ droidboot_modules := \
 	kexec \
 	droidboot \
 
+ifeq ($(HAS_SPINOR),true)
+droidboot_modules += \
+	FPT \
+	fparts.txt \
+	TXEManuf \
+	TXEManuf.cfg \
+	vsccommn.bin \
+	Intel_PSI_Software_Tools_License_Agreement_101713cl.txt
+endif
+
 ifeq ($(TARGET_BOARD_PLATFORM), clovertrail)
 droidboot_pvrsrvctl := $(PRODUCT_OUT)/system/vendor/bin/pvrsrvctl
 

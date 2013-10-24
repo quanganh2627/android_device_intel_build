@@ -36,6 +36,16 @@ recovery_modules := \
 	libusbhost \
 	teeprov
 
+ifeq ($(HAS_SPINOR),true)
+recovery_modules += \
+	FPT \
+	fparts.txt \
+	TXEManuf \
+	TXEManuf.cfg \
+	vsccommn.bin \
+	Intel_PSI_Software_Tools_License_Agreement_101713cl.txt
+endif
+
 recovery_system_files := $(call module-installed-files,$(recovery_modules))
 define recovery-copy-files
 $(hide) $(foreach srcfile,$(recovery_system_files), \
