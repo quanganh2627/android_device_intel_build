@@ -80,12 +80,14 @@ INTERNAL_DROIDBOOTIMAGE_ARGS := \
 	--kernel $(droidboot_kernel) \
 	--ramdisk $(droidboot_ramdisk)
 
-INTERNAL_DROIDBOOTIMAGE_ARGS += --product $(REF_DEVICE_NAME)
-# Allow board to overwrite the type used for droid boot image
-ifdef DROIDBOOT_OS_TYPE
-  INTERNAL_DROIDBOOTIMAGE_ARGS += --type $(DROIDBOOT_OS_TYPE)
-else
-  INTERNAL_DROIDBOOTIMAGE_ARGS += --type droidboot
+ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE),true)
+	INTERNAL_DROIDBOOTIMAGE_ARGS += --product $(REF_DEVICE_NAME)
+	# Allow board to overwrite the type used for droid boot image
+	ifdef DROIDBOOT_OS_TYPE
+		INTERNAL_DROIDBOOTIMAGE_ARGS += --type $(DROIDBOOT_OS_TYPE)
+	else
+		INTERNAL_DROIDBOOTIMAGE_ARGS += --type droidboot
+	endif
 endif
 
 # Assumes this has already been stripped
