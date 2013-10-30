@@ -4,6 +4,7 @@ ifeq (,$(filter true, $(TARGET_NO_KERNEL) $(TARGET_NO_RECOVERY) $(BUILD_TINY_AND
 
 INSTALLED_RECOVERYIMAGE_TARGET := $(PRODUCT_OUT)/recovery.img
 
+RECOVERY_PATH := $(TOP)/bootable/recovery
 recovery_initrc := $(call get-specific-config-file ,recovery.init.rc)
 recovery_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
 recovery_ramdisk := $(PRODUCT_OUT)/ramdisk-recovery.img
@@ -106,6 +107,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/etc/recovery.fstab $(MKPARTITIONFILE)
+	cp -f $(RECOVERY_PATH)/recovery_uefi.fstab $(TARGET_RECOVERY_ROOT_OUT)/etc/
 	cp -f $(recovery_initrc) $(TARGET_RECOVERY_ROOT_OUT)/init.rc
 	if [ -f $(RECOVERY_DEBUG_PATH)/init.recovery.debug.rc ]; then \
 	cp -f $(RECOVERY_DEBUG_PATH)/init.recovery.debug.rc $(TARGET_RECOVERY_ROOT_OUT); \

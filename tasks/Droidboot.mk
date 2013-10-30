@@ -93,7 +93,7 @@ else
   INTERNAL_DROIDBOOTIMAGE_ARGS += --type droidboot
 endif
 
-BOARD_KERNEL_CMDLINE_DROIDBOOT := console=ttyS0,115200 console=logk0 drm.debug=0x0 kmemleak=off androidboot.bootmedia=$(BOARD_BOOTMEDIA) androidboot.boardid=129 androidboot.hardware=$(TARGET_DEVICE) $(cmdline_extra)
+BOARD_KERNEL_CMDLINE_DROIDBOOT := console=ttyS0,115200 console=logk0 droidboot.uefi=1 kmemleak=off androidboot.bootmedia=$(BOARD_BOOTMEDIA) androidboot.boardid=129 androidboot.hardware=$(TARGET_DEVICE) $(cmdline_extra)
 
 # Assumes this has already been stripped
 ifdef BOARD_KERNEL_CMDLINE
@@ -134,6 +134,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab $(MKPARTITIONFILE)
+	cp -f $(DROIDBOOT_PATH)/recovery_uefi.fstab $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/
 	cp -f $(PRODUCT_OUT)/partition.tbl $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/
 	cp -f $(droidboot_initrc) $(TARGET_DROIDBOOT_ROOT_OUT)/init.rc
 ifneq (,$(filter %_next, $(TARGET_PRODUCT)))
