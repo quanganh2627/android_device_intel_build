@@ -25,11 +25,6 @@ $(PRODUCT_OUT)/root/fstab.$(TARGET_DEVICE): $(DEFAULT_PARTITION) $(DEFAULT_MOUNT
 	$(hide)mkdir -p $(dir $@)
 	PART_MOUNT_OUT_FILE=$@	$(MKPARTITIONFILE)
 
-# android recovery fstab
-$(PRODUCT_OUT)/system/etc/recovery.fstab: $(DEFAULT_PARTITION) $(DEFAULT_MOUNT) $(PART_MOUNT_OVERRIDE_FILES)
-	$(hide)mkdir -p $(dir $@)
-	PART_MOUNT_OUT_FILE=$@	$(MKPARTITIONFILE)
-
 # android charger fstab
 $(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE): $(DEFAULT_PARTITION) $(DEFAULT_MOUNT) $(PART_MOUNT_OVERRIDE_FILES)
 	$(hide)mkdir -p $(dir $@)
@@ -43,7 +38,6 @@ $(PRODUCT_OUT)/root/fstab.ramconsole.$(TARGET_DEVICE): $(DEFAULT_PARTITION) $(DE
 $(BUILT_RAMDISK_TARGET): \
 	$(PRODUCT_OUT)/root/fstab.$(TARGET_DEVICE) \
 	$(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE) \
-	$(PRODUCT_OUT)/system/etc/recovery.fstab \
 	$(PRODUCT_OUT)/root/fstab.ramconsole.$(TARGET_DEVICE)
 
 blank_flashfiles: $(PRODUCT_OUT)/partition.tbl
