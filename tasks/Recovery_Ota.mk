@@ -258,6 +258,9 @@ ifdef BOARD_KERNEL_PAGESIZE
 	$(hide) echo "$(BOARD_KERNEL_PAGESIZE)" > $(zip_root)/RECOVERY/pagesize
 endif
 endif # !TARGET_MAKE_INTEL_BOOTIMAGE
+ifeq ($(RECOVERY_DO_PARTITIONING),true)
+	$(hide) $(ACP) $(PRODUCT_OUT)/partition.tbl $(zip_root)/RECOVERY/
+endif
 	@# Components of the boot image
 ifeq ($(TARGET_MAKE_INTEL_BOOTIMAGE),true)
 	$(hide) mkdir -p $(zip_root)/RECOVERY/RAMDISK/etc
@@ -371,6 +374,12 @@ endif
 name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
+endif
+ifeq ($(RECOVERY_DO_PARTITIONING),true)
+  EXTRA_OTA_GEN_OPTIONS += --do_partitioning
+endif
+ifeq ($(TARGET_PARTITIONING_SCHEME),"full-gpt")
+  EXTRA_OTA_GEN_OPTIONS += --full_gpt
 endif
 name := $(name)-ota-$(FILE_NAME_TAG)
 
