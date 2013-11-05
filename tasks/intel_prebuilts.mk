@@ -1,3 +1,4 @@
+ifeq (0,1)
 ifneq ($(TARGET_OUT_prebuilts),)
 intel_prebuilts_top_makefile := $(TARGET_OUT_prebuilts)/Android.mk
 $(intel_prebuilts_top_makefile):
@@ -68,3 +69,4 @@ intel_prebuilts: $(intel_prebuilts_top_makefile)
 		$(foreach m, $?,\
 			echo "    " $(m);) \
 		find $(TARGET_OUT_prebuilts) -name Android.mk -print -exec cat {} \;)
+endif
