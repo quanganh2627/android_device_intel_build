@@ -30,6 +30,18 @@ $(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE): $(DEFAULT_PARTITION) $(DEFAU
 	$(hide)mkdir -p $(dir $@)
 	PART_MOUNT_OUT_FILE=$@	$(MKPARTITIONFILE)
 
+ifeq ($(TARGET_USE_GUMMIBOOT),true)
+$(PRODUCT_OUT)/root/fstab.$(TARGET_DEVICE):
+	$(hide)mkdir -p $(dir $@)
+	$(hide) rm -f $(PRODUCT_OUT)/root/fstab.$(TARGET_DEVICE)
+	$(hide) cp $(TOP)/device/intel/baytrail/byt_m_crb/fstab.byt_m_crb $(PRODUCT_OUT)/root/
+
+# android charger fstab
+$(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE):
+	$(hide) rm -f $(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE)
+	$(hide) cp $(TOP)/device/intel/baytrail/byt_m_crb/fstab.charger.byt_m_crb $(PRODUCT_OUT)/root/
+endif
+
 # android ramconsole fstab
 $(PRODUCT_OUT)/root/fstab.ramconsole.$(TARGET_DEVICE): $(DEFAULT_PARTITION) $(DEFAULT_MOUNT) $(PART_MOUNT_OVERRIDE_FILES)
 	$(hide)mkdir -p $(dir $@)
