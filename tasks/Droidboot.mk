@@ -110,7 +110,9 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(droidboot_kernel) \
 		$(droidboot_logcat) \
 		$(droidboot_build_prop) \
-		$(PRODUCT_OUT)/partition.tbl
+		$(PRODUCT_OUT)/partition.tbl \
+		isu \
+		isu_wrapper
 	@echo ----- Making droidboot image ------
 	rm -rf $(TARGET_DROIDBOOT_OUT)
 	mkdir -p $(TARGET_DROIDBOOT_OUT)
@@ -147,7 +149,7 @@ endif
 	        > $(TARGET_DROIDBOOT_ROOT_OUT)/default.prop
 	$(hide) $(call droidboot-copy-files,$(TARGET_OUT),$(TARGET_DROIDBOOT_ROOT_OUT)/system/)
 	$(MKBOOTFS) $(TARGET_DROIDBOOT_ROOT_OUT) | $(MINIGZIP) > $(droidboot_ramdisk)
-	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_DROIDBOOTIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS)
+	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_DROIDBOOTIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS)
 	@echo ----- Made droidboot image -------- $@
 
 else
