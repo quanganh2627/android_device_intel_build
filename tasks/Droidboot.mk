@@ -44,7 +44,6 @@ droidboot_modules := \
 	gzip \
 	kexec \
 	droidboot \
-	partlink \
 
 ifeq ($(TARGET_BOARD_PLATFORM), clovertrail)
 droidboot_pvrsrvctl := $(PRODUCT_OUT)/system/vendor/bin/pvrsrvctl
@@ -126,6 +125,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_DROIDBOOT_OUT)
 	rm $(TARGET_DROIDBOOT_ROOT_OUT)/init*.rc
 	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_DROIDBOOT_OUT)/root/
+	cp $(TARGET_ROOT_OUT)/init.partlink.rc $(TARGET_DROIDBOOT_OUT)/root/
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab $(MKPARTITIONFILE)

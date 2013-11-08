@@ -19,7 +19,7 @@ ifeq ($(TARGET_ARCH),x86-64)
     EFI_ARCH := x86_64
 endif
 
-$(INSTALLED_ESPIMAGE_TARGET): $(BUILD_ESPIMAGE_DIR) efilinux | $(HOST_OUT_EXECUTABLES)/mcopy
+$(INSTALLED_ESPIMAGE_TARGET): $(BUILD_ESPIMAGE_DIR) efilinux | $(HOST_OUT_EXECUTABLES)/mcopy $(HOST_OUT_EXECUTABLES)/mkdosfs
 	$(call pretty,"Target ESP image: $@")
 	$(hide) mkdir -p $(PRODUCT_OUT)/esp/EFI/BOOT $(PRODUCT_OUT)/esp/EFI/Intel
 	$(hide) ln -sf ../../../efilinux.efi $(PRODUCT_OUT)/esp/EFI/BOOT/boot$(EFI_ARCH).efi
