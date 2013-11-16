@@ -28,6 +28,7 @@ recovery_modules := \
 	libm \
 	libstdc++ \
 	libusbhost \
+	teeprov
 
 recovery_system_files := $(call module-installed-files,$(recovery_modules))
 define recovery-copy-files
@@ -129,7 +130,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	cat $(INSTALLED_DEFAULT_PROP_TARGET) $(recovery_build_prop) \
 	        > $(TARGET_RECOVERY_ROOT_OUT)/default.prop
 	$(MKBOOTFS) $(TARGET_RECOVERY_ROOT_OUT) | $(MINIGZIP) > $(recovery_ramdisk)
-	$(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_RECOVERYIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS)
+	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_RECOVERYIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS)
 	@echo ----- Made recovery image -------- $@
 	$(hide) $(call assert-max-image-size,$@,$(BOARD_RECOVERYIMAGE_PARTITION_SIZE),raw)
 else
@@ -322,6 +323,9 @@ ifeq ($(BOARD_HAS_ULPMC),true)
 endif
 ifeq ($(BOARD_HAVE_MODEM),false)
   EXTRA_OTA_GEN_OPTIONS += --no_modem
+endif
+ifeq ($(BUILD_WITH_SECURITY_FRAMEWORK),chaabi_token)
+  EXTRA_OTA_GEN_OPTIONS += --intel_chaabi_token
 endif
 name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
