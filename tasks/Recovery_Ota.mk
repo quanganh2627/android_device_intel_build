@@ -116,8 +116,8 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	if [ -f $(RECOVERY_DEBUG_PATH)/init.recovery.debug.rc ]; then \
 	cp -f $(RECOVERY_DEBUG_PATH)/init.recovery.debug.rc $(TARGET_RECOVERY_ROOT_OUT); \
 	fi
-	if [ -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_DEVICE).rc ]; then \
-	cp -f $(TARGET_DEVICE_DIR)/recovery.init.$(TARGET_DEVICE).rc $(TARGET_RECOVERY_ROOT_OUT); \
+	if [ -f $(DEVICE_CONF_PATH)/recovery.init.$(TARGET_DEVICE).rc ]; then \
+	cp -f $(DEVICE_CONF_PATH)/recovery.init.$(TARGET_DEVICE).rc $(TARGET_RECOVERY_ROOT_OUT); \
 	fi
 	cp -f $(recovery_binary) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
 	cp -f $(recovery_watchdogd) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
