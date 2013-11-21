@@ -38,6 +38,11 @@ droidboot_modules := \
 	libsparse \
 	libusbhost \
 	libz \
+	libicuuc \
+	libgabi++ \
+	libstlport \
+	mmgr_xml \
+	telephony_scalability.xml \
 	resize2fs \
 	tune2fs \
 	e2fsck \
@@ -118,7 +123,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	mkdir -p $(TARGET_DROIDBOOT_OUT)
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/tmp
-	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc
+	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/telephony
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/mnt/sdcard
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin
@@ -127,6 +132,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	rm $(TARGET_DROIDBOOT_ROOT_OUT)/init*.rc
 	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_DROIDBOOT_OUT)/root/
 	cp $(TARGET_ROOT_OUT)/init.partlink.rc $(TARGET_DROIDBOOT_OUT)/root/
+	cp $(TARGET_OUT_ETC)/telephony/*.xml $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/telephony/
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/system/etc/recovery.fstab $(MKPARTITIONFILE)
