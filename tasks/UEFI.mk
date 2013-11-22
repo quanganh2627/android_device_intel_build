@@ -19,11 +19,12 @@ ifeq ($(TARGET_ARCH),x86-64)
     EFI_ARCH := x86_64
 endif
 
-$(INSTALLED_ESPIMAGE_TARGET): $(BUILD_ESPIMAGE_DIR) efilinux | $(HOST_OUT_EXECUTABLES)/mcopy $(HOST_OUT_EXECUTABLES)/mkdosfs
+$(INSTALLED_ESPIMAGE_TARGET): $(BUILD_ESPIMAGE_DIR) efilinux warmdump | $(HOST_OUT_EXECUTABLES)/mcopy $(HOST_OUT_EXECUTABLES)/mkdosfs
 	$(call pretty,"Target ESP image: $@")
-	$(hide) mkdir -p $(PRODUCT_OUT)/esp/EFI/BOOT $(PRODUCT_OUT)/esp/EFI/Intel
+	$(hide) mkdir -p $(PRODUCT_OUT)/esp/EFI/BOOT $(PRODUCT_OUT)/esp/EFI/Intel $(PRODUCT_OUT)/esp/EFI/Intel/Data
 	$(hide) $(ACP) $(PRODUCT_OUT)/efilinux.efi $(PRODUCT_OUT)/esp/EFI/BOOT/boot$(EFI_ARCH).efi
 	$(hide) $(ACP) $(PRODUCT_OUT)/efilinux.efi $(PRODUCT_OUT)/esp/EFI/Intel/
+	$(hide) $(ACP) $(PRODUCT_OUT)/warmdump.efi $(PRODUCT_OUT)/esp/EFI/Intel/
 
 ifeq ($(BOARD_HAS_CAPSULE),true)
 ifneq (,$(wildcard $(BIOS_CAPSULE_INPUT_FILE)))
