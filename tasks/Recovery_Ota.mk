@@ -50,7 +50,6 @@ INTERNAL_RECOVERYIMAGE_ARGS := \
 	--ramdisk $(recovery_ramdisk)
 
 ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE),true)
-  INTERNAL_RECOVERYIMAGE_ARGS += --product $(REF_DEVICE_NAME)
   INTERNAL_RECOVERYIMAGE_ARGS += --type recovery
 endif
 
