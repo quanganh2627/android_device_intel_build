@@ -110,7 +110,9 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(droidboot_kernel) \
 		$(droidboot_logcat) \
 		$(droidboot_build_prop) \
-		$(PRODUCT_OUT)/partition.tbl
+		$(PRODUCT_OUT)/partition.tbl \
+		isu \
+		isu_wrapper
 	@echo ----- Making droidboot image ------
 	rm -rf $(TARGET_DROIDBOOT_OUT)
 	mkdir -p $(TARGET_DROIDBOOT_OUT)
@@ -133,8 +135,8 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	if [ -f $(DROIDBOOT_DEBUG_PATH)/init.droidboot.debug.rc ]; then \
 	cp -f $(DROIDBOOT_DEBUG_PATH)/init.droidboot.debug.rc $(TARGET_DROIDBOOT_ROOT_OUT); \
 	fi
-	if [ -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_DEVICE).rc ]; then \
-	cp -f $(TARGET_DEVICE_DIR)/droidboot.init.$(TARGET_DEVICE).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
+	if [ -f $(DEVICE_CONF_PATH)/droidboot.init.$(TARGET_DEVICE).rc ]; then \
+	cp -f $(DEVICE_CONF_PATH)/droidboot.init.$(TARGET_DEVICE).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
 	fi
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin/
@@ -147,7 +149,7 @@ endif
 	        > $(TARGET_DROIDBOOT_ROOT_OUT)/default.prop
 	$(hide) $(call droidboot-copy-files,$(TARGET_OUT),$(TARGET_DROIDBOOT_ROOT_OUT)/system/)
 	$(MKBOOTFS) $(TARGET_DROIDBOOT_ROOT_OUT) | $(MINIGZIP) > $(droidboot_ramdisk)
-	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_DROIDBOOTIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS)
+	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_DROIDBOOTIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS)
 	@echo ----- Made droidboot image -------- $@
 
 else
