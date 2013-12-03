@@ -1,3 +1,8 @@
+
+#check for compression level, to speed up build
+FLASHFILE_COMPRESSION_LEVEL ?= 1
+ZIP_COMP := -$(FLASHFILE_COMPRESSION_LEVEL)
+
 # If neither TARGET_NO_KERNEL nor TARGET_NO_RECOVERY are true
 ifeq ($(TARGET_MAKE_NO_DEFAULT_RECOVERY),true)
 ifeq (,$(filter true, $(TARGET_NO_KERNEL) $(TARGET_NO_RECOVERY) $(BUILD_TINY_ANDROID)))
@@ -234,7 +239,7 @@ ifeq ($(TARGET_USE_DROIDBOOT),true)
 endif
 	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
 	$(hide) mkdir -p $(zip_root)/FIRMWARE
-	$(hide) find $(PRODUCT_OUT)/ifwi -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
+	$(hide) find $(PRODUCT_OUT)/ifwi -type f -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
 else
 	$(hide) $(call package_files-copy-root, \
 		$(TARGET_ROOT_OUT),$(zip_root)/BOOT/RAMDISK)
@@ -298,12 +303,12 @@ ifdef PRODUCT_EXTRA_RECOVERY_KEYS
 endif
 	$(call generate-userimage-prop-dictionary, $(zip_root)/META/misc_info.txt)
 	@# Zip everything up, preserving symlinks
-	$(hide) (cd $(zip_root) && zip -qry ../$(notdir $@) .)
+	$(hide) (cd $(zip_root) && zip $(ZIP_COMP) -qry ../$(notdir $@) .)
 	@# Run fs_config on all the system, boot ramdisk, and recovery ramdisk files in the zip, and save the output
 	$(hide) zipinfo -1 $@ | awk 'BEGIN { FS="SYSTEM/" } /^SYSTEM\// {print "system/" $$2}' | $(HOST_OUT_EXECUTABLES)/fs_config > $(zip_root)/META/filesystem_config.txt
 	$(hide) zipinfo -1 $@ | awk 'BEGIN { FS="BOOT/RAMDISK/" } /^BOOT\/RAMDISK\// {print $$2}' | $(HOST_OUT_EXECUTABLES)/fs_config > $(zip_root)/META/boot_filesystem_config.txt
 	$(hide) zipinfo -1 $@ | awk 'BEGIN { FS="RECOVERY/RAMDISK/" } /^RECOVERY\/RAMDISK\// {print $$2}' | $(HOST_OUT_EXECUTABLES)/fs_config > $(zip_root)/META/recovery_filesystem_config.txt
-	$(hide) (cd $(zip_root) && zip -q ../$(notdir $@) META/*filesystem_config.txt)
+	$(hide) (cd $(zip_root) && zip $(ZIP_COMP) -q ../$(notdir $@) META/*filesystem_config.txt)
 
 target-files-package: $(BUILT_TARGET_FILES_PACKAGE)
 
