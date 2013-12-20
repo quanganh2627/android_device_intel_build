@@ -1,3 +1,8 @@
+
+#check for compression level, to speed up build
+FLASHFILE_COMPRESSION_LEVEL ?= 1
+ZIP_COMP := -$(FLASHFILE_COMPRESSION_LEVEL)
+
 # If neither TARGET_NO_KERNEL nor TARGET_NO_RECOVERY are true
 ifeq ($(TARGET_MAKE_NO_DEFAULT_RECOVERY),true)
 ifeq (,$(filter true, $(TARGET_NO_KERNEL) $(TARGET_NO_RECOVERY) $(BUILD_TINY_ANDROID)))
@@ -5,6 +10,7 @@ ifeq (,$(filter true, $(TARGET_NO_KERNEL) $(TARGET_NO_RECOVERY) $(BUILD_TINY_AND
 INSTALLED_RECOVERYIMAGE_TARGET := $(PRODUCT_OUT)/recovery.img
 
 recovery_initrc := $(call get-specific-config-file ,recovery.init.rc)
+recovery_aplogs_script := $(call get-specific-config-file ,retrieve_aplogs.sh)
 recovery_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
 recovery_ramdisk := $(PRODUCT_OUT)/ramdisk-recovery.img
 recovery_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
@@ -113,6 +119,7 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/etc/recovery.fstab $(MKPARTITIONFILE)
 	cp -f $(recovery_initrc) $(TARGET_RECOVERY_ROOT_OUT)/init.rc
+	cp -f $(recovery_aplogs_script) $(TARGET_RECOVERY_ROOT_OUT)/etc/retrieve_aplogs.sh
 	if [ -f $(RECOVERY_DEBUG_PATH)/init.recovery.debug.rc ]; then \
 	cp -f $(RECOVERY_DEBUG_PATH)/init.recovery.debug.rc $(TARGET_RECOVERY_ROOT_OUT); \
 	fi
@@ -229,12 +236,13 @@ ifeq ($(TARGET_MAKE_INTEL_BOOTIMAGE),true)
 	$(hide) mkdir -p $(zip_root)/RECOVERY/RAMDISK/etc
 	$(hide) $(ACP) $(PRODUCT_OUT)/recovery.img $(zip_root)/RECOVERY/
 	$(hide) $(ACP) $(TARGET_RECOVERY_ROOT_OUT)/etc/recovery.fstab $(zip_root)/RECOVERY/RAMDISK/etc
+	$(hide) $(ACP) -p $(TARGET_RECOVERY_ROOT_OUT)/etc/retrieve_aplogs.sh $(zip_root)/RECOVERY/RAMDISK/etc/retrieve_aplogs.sh
 ifeq ($(TARGET_USE_DROIDBOOT),true)
 	$(hide) $(ACP) $(PRODUCT_OUT)/droidboot.img $(zip_root)/RECOVERY/
 endif
 	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
 	$(hide) mkdir -p $(zip_root)/FIRMWARE
-	$(hide) find $(PRODUCT_OUT)/ifwi -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
+	$(hide) find $(PRODUCT_OUT)/ifwi -type f -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
 else
 	$(hide) $(call package_files-copy-root, \
 		$(TARGET_ROOT_OUT),$(zip_root)/BOOT/RAMDISK)
@@ -298,12 +306,12 @@ ifdef PRODUCT_EXTRA_RECOVERY_KEYS
 endif
 	$(call generate-userimage-prop-dictionary, $(zip_root)/META/misc_info.txt)
 	@# Zip everything up, preserving symlinks
-	$(hide) (cd $(zip_root) && zip -qry ../$(notdir $@) .)
+	$(hide) (cd $(zip_root) && zip $(ZIP_COMP) -qry ../$(notdir $@) .)
 	@# Run fs_config on all the system, boot ramdisk, and recovery ramdisk files in the zip, and save the output
 	$(hide) zipinfo -1 $@ | awk 'BEGIN { FS="SYSTEM/" } /^SYSTEM\// {print "system/" $$2}' | $(HOST_OUT_EXECUTABLES)/fs_config > $(zip_root)/META/filesystem_config.txt
 	$(hide) zipinfo -1 $@ | awk 'BEGIN { FS="BOOT/RAMDISK/" } /^BOOT\/RAMDISK\// {print $$2}' | $(HOST_OUT_EXECUTABLES)/fs_config > $(zip_root)/META/boot_filesystem_config.txt
 	$(hide) zipinfo -1 $@ | awk 'BEGIN { FS="RECOVERY/RAMDISK/" } /^RECOVERY\/RAMDISK\// {print $$2}' | $(HOST_OUT_EXECUTABLES)/fs_config > $(zip_root)/META/recovery_filesystem_config.txt
-	$(hide) (cd $(zip_root) && zip -q ../$(notdir $@) META/*filesystem_config.txt)
+	$(hide) (cd $(zip_root) && zip $(ZIP_COMP) -q ../$(notdir $@) META/*filesystem_config.txt)
 
 target-files-package: $(BUILT_TARGET_FILES_PACKAGE)
 
