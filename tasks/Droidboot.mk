@@ -50,7 +50,6 @@ droidboot_modules += \
 	libicuuc \
 	libgabi++ \
 	libstlport \
-	mmgr_xml \
 	telephony_scalability.xml \
 
 endif
@@ -153,6 +152,7 @@ endif
 	cp $(TARGET_ROOT_OUT)/init.partlink.rc $(TARGET_DROIDBOOT_OUT)/root/
 ifeq ($(BOARD_HAVE_MODEM), true)
 	cp $(TARGET_OUT_ETC)/telephony/*.xml $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/telephony/
+	sed -i '/mmgr/d' $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/telephony/telephony_scalability.xml
 endif
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_DROIDBOOT_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
