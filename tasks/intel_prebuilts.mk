@@ -52,6 +52,25 @@ $(if $(_ext_new_modules),$(eval _ext_lib_deps += $(_ext_new_modules))\
   $(call ext-expand-required-shared-libraries,$(_ext_new_modules)))
 endef
 
+
+# NOTE: function from build/core/definitions.mk
+###########################################################
+## Expand a module name list with REQUIRED modules
+###########################################################
+# $(1): The variable name that holds the initial module name list.
+#       the variable will be modified to hold the expanded results.
+# $(2): The initial module name list.
+# Returns empty string (maybe with some whitespaces).
+define ext-expand-required-modules
+$(eval _erm_new_modules := $(sort $(filter-out $($(1)),\
+  $(foreach m,$(2),$(ALL_MODULES.$(m).REQUIRED)))))\
+$(if $(_erm_new_modules),$(eval $(1) += $(_erm_new_modules))\
+  $(call ext-expand-required-modules,$(1),$(_erm_new_modules)))
+endef
+
+# Find the dependent required modules
+$(call ext-expand-required-modules, _ext_lib_deps, $(_ext_lib_deps))
+
 # Find depending libraries recursively
 $(call ext-expand-required-shared-libraries,$(_ext_lib_deps))
 
