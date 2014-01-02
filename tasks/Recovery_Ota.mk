@@ -253,7 +253,7 @@ ifeq ($(TARGET_USE_DROIDBOOT),true)
 	$(hide) $(ACP) $(PRODUCT_OUT)/droidboot.img $(zip_root)/RECOVERY/
 endif
 	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
-	$(hide) find $(PRODUCT_OUT)/ifwi -type f -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
+	$(hide) -find $(PRODUCT_OUT)/ifwi -type f -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
 else
 	$(hide) $(call package_files-copy-root, \
 		$(TARGET_ROOT_OUT),$(zip_root)/BOOT/RAMDISK)
@@ -289,8 +289,9 @@ endif # TARGET_MAKE_INTEL_BOOTIMAGE
 	$(hide) $(ACP) $(INSTALLED_ANDROID_INFO_TXT_TARGET) $(zip_root)/OTA/
 	$(hide) $(ACP) $(PRIVATE_OTA_TOOLS) $(zip_root)/OTA/bin/
 ifeq ($(BOARD_HAS_CAPSULE),true)
-ifdef IFWI_PREBUILT_PATHS
-	$(ACP) $(IFWI_PREBUILT_PATHS)/capsule.bin $(zip_root)/FIRMWARE/capsule.bin
+#We test if IFWI_PREBUILT_PATHS is correctly set to avoid issue with external build
+ifneq (,$(wildcard $(IFWI_PREBUILT_PATHS)))
+	$(hide) $(ACP) $(IFWI_PREBUILT_PATHS)/capsule.bin $(zip_root)/FIRMWARE/capsule.bin
 endif
 endif
 ifeq ($(BOARD_HAS_ULPMC),true)
