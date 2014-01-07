@@ -4,12 +4,9 @@ INTERNAL_ESPIMAGE_FILES := $(filter $(TARGET_ROOT_OUT)/esp/%, \
     $(ALL_GENERATED_SOURCES) \
     $(ALL_DEFAULT_INSTALLED_MODULES))
 
-BUILT_ESPIMAGE_TARGET := $(PRODUCT_OUT)/esp.img
 BUILD_ESPIMAGE_DIR := $(PRODUCT_OUT)/esp
 
-INSTALLED_ESPIMAGE_TARGET := $(BUILT_ESPIMAGE_TARGET)
-
-BIOS_CAPSULE_INPUT_FILE := ../../../../../$(FW_INGREDIENTS_PATHS)/capsule.bin
+BIOS_CAPSULE_INPUT_FILE := $(FW_INGREDIENTS_PATHS)/capsule.bin
 BIOS_CAPSULE_OUTPUT_FILE := BiosUpdate.fv
 
 $(BUILD_ESPIMAGE_DIR):
@@ -25,17 +22,18 @@ endif
 $(INSTALLED_ESPIMAGE_TARGET): $(BUILD_ESPIMAGE_DIR) efilinux | $(HOST_OUT_EXECUTABLES)/mcopy $(HOST_OUT_EXECUTABLES)/mkdosfs
 	$(call pretty,"Target ESP image: $@")
 	$(hide) mkdir -p $(PRODUCT_OUT)/esp/EFI/BOOT $(PRODUCT_OUT)/esp/EFI/Intel
-	$(hide) ln -sf ../../../efilinux.efi $(PRODUCT_OUT)/esp/EFI/BOOT/boot$(EFI_ARCH).efi
-	$(hide) ln -sf ../../../efilinux.efi $(PRODUCT_OUT)/esp/EFI/Intel/
+	$(hide) $(ACP) $(PRODUCT_OUT)/efilinux.efi $(PRODUCT_OUT)/esp/EFI/BOOT/boot$(EFI_ARCH).efi
+	$(hide) $(ACP) $(PRODUCT_OUT)/efilinux.efi $(PRODUCT_OUT)/esp/EFI/Intel/
+
 ifeq ($(BOARD_HAS_CAPSULE),true)
 ifneq (,$(wildcard $(BIOS_CAPSULE_INPUT_FILE)))
-	ln -sf $(BIOS_CAPSULE_INPUT_FILE) $(PRODUCT_OUT)/esp/$(BIOS_CAPSULE_OUTPUT_FILE)
+	$(hide) $(ACP) $(BIOS_CAPSULE_INPUT_FILE) $(PRODUCT_OUT)/esp/$(BIOS_CAPSULE_OUTPUT_FILE)
 else
-	$(hide) echo "$(BIOS_CAPSULE_INPUT_FILE) file doesn't exist, not included in $(BUILT_ESPIMAGE_TARGET)"
+	$(hide) echo "$(BIOS_CAPSULE_INPUT_FILE) file doesn't exist, not included in $(INSTALLED_ESPIMAGE_TARGET)"
 endif
 endif
 	$(hide) vendor/intel/support/make_vfatfs "ESP" \
-		$(BUILT_ESPIMAGE_TARGET) \
+		$(INSTALLED_ESPIMAGE_TARGET) \
 		$(shell python -c 'import json; print json.load(open("'$(PART_MOUNT_OVERRIDE_FILE)'"))["partitions"]["ESP"]["size"]') \
 		$(PRODUCT_OUT)/esp
 

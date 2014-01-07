@@ -214,12 +214,15 @@ $(BUILT_TARGET_FILES_PACKAGE): \
 		$(APKCERTS_FILE) \
 		$(HOST_OUT_EXECUTABLES)/fs_config \
 		firmware \
+		$(INSTALLED_ESPIMAGE_TARGET) \
 		| $(ACP)
 	@echo "Package target files: $@"
 	$(hide) rm -rf $@ $(zip_root)
 	$(hide) mkdir -p $(dir $@) $(zip_root)
 	@# Components of the recovery image
 	$(hide) mkdir -p $(zip_root)/RECOVERY
+	$(hide) mkdir -p $(zip_root)/BOOT
+	$(hide) mkdir -p $(zip_root)/FIRMWARE
 ifneq ($(TARGET_MAKE_INTEL_BOOTIMAGE),)
 	$(hide) $(call package_files-copy-root, \
 		$(TARGET_RECOVERY_ROOT_OUT),$(zip_root)/RECOVERY/RAMDISK)
@@ -241,7 +244,6 @@ ifdef BOARD_KERNEL_PAGESIZE
 endif
 endif # !TARGET_MAKE_INTEL_BOOTIMAGE
 	@# Components of the boot image
-	$(hide) mkdir -p $(zip_root)/BOOT
 ifeq ($(TARGET_MAKE_INTEL_BOOTIMAGE),true)
 	$(hide) mkdir -p $(zip_root)/RECOVERY/RAMDISK/etc
 	$(hide) $(ACP) $(PRODUCT_OUT)/recovery.img $(zip_root)/RECOVERY/
@@ -251,7 +253,6 @@ ifeq ($(TARGET_USE_DROIDBOOT),true)
 	$(hide) $(ACP) $(PRODUCT_OUT)/droidboot.img $(zip_root)/RECOVERY/
 endif
 	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
-	$(hide) mkdir -p $(zip_root)/FIRMWARE
 	$(hide) find $(PRODUCT_OUT)/ifwi -type f -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
 else
 	$(hide) $(call package_files-copy-root, \
@@ -294,6 +295,9 @@ endif
 endif
 ifeq ($(BOARD_HAS_ULPMC),true)
 	$(ACP) $(ULPMC_BINARY) $(zip_root)/FIRMWARE/ulpmc.bin
+endif
+ifneq ($(INSTALLED_ESPIMAGE_TARGET),)
+	$(hide) $(ACP) $(INSTALLED_ESPIMAGE_TARGET) $(zip_root)/FIRMWARE
 endif
 	@# Files that do not end up in any images, but are necessary to
 	@# build them.
