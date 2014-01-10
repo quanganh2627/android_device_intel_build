@@ -137,6 +137,7 @@ endif
 	rm $(TARGET_RECOVERY_ROOT_OUT)/init*.rc
 	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_RECOVERY_OUT)/root/
 	cp $(TARGET_ROOT_OUT)/init.partlink.rc $(TARGET_RECOVERY_OUT)/root/
+	-cp $(TARGET_ROOT_OUT)/init.firmware.rc $(TARGET_RECOVERY_OUT)/root/
 ifeq ($(BOARD_HAVE_MODEM), true)
 	cp $(TARGET_OUT_ETC)/telephony/*.xml $(TARGET_RECOVERY_ROOT_OUT)/etc/telephony/
 endif
