@@ -150,6 +150,7 @@ endif
 	rm $(TARGET_DROIDBOOT_ROOT_OUT)/init*.rc
 	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_DROIDBOOT_OUT)/root/
 	cp $(TARGET_ROOT_OUT)/init.partlink.rc $(TARGET_DROIDBOOT_OUT)/root/
+	-cp $(TARGET_ROOT_OUT)/init.firmware.rc $(TARGET_DROIDBOOT_OUT)/root/
 ifeq ($(BOARD_HAVE_MODEM), true)
 	cp $(TARGET_OUT_ETC)/telephony/*.xml $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/telephony/
 	sed -i '/mmgr/d' $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/telephony/telephony_scalability.xml
