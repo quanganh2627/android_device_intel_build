@@ -46,6 +46,15 @@ recovery_modules += \
 	Intel_PSI_Software_Tools_License_Agreement_101713cl.txt
 endif
 
+ifeq ($(BOARD_HAVE_MODEM), true)
+recovery_modules += \
+	libicuuc \
+	libgabi++ \
+	libstlport \
+	mmgr_xml \
+	telephony_scalability.xml
+endif
+
 recovery_system_files := $(call module-installed-files,$(recovery_modules))
 define recovery-copy-files
 $(hide) $(foreach srcfile,$(recovery_system_files), \
@@ -120,11 +129,18 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/etc
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/tmp
+ifeq ($(BOARD_HAVE_MODEM), true)
+	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/etc/telephony
+endif
 	echo Copying baseline ramdisk...
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_RECOVERY_OUT)
 	rm $(TARGET_RECOVERY_ROOT_OUT)/init*.rc
 	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_RECOVERY_OUT)/root/
 	cp $(TARGET_ROOT_OUT)/init.partlink.rc $(TARGET_RECOVERY_OUT)/root/
+	-cp $(TARGET_ROOT_OUT)/init.firmware.rc $(TARGET_RECOVERY_OUT)/root/
+ifeq ($(BOARD_HAVE_MODEM), true)
+	cp $(TARGET_OUT_ETC)/telephony/*.xml $(TARGET_RECOVERY_ROOT_OUT)/etc/telephony/
+endif
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/etc/recovery.fstab $(MKPARTITIONFILE)
@@ -214,12 +230,15 @@ $(BUILT_TARGET_FILES_PACKAGE): \
 		$(APKCERTS_FILE) \
 		$(HOST_OUT_EXECUTABLES)/fs_config \
 		firmware \
+		$(INSTALLED_ESPIMAGE_TARGET) \
 		| $(ACP)
 	@echo "Package target files: $@"
 	$(hide) rm -rf $@ $(zip_root)
 	$(hide) mkdir -p $(dir $@) $(zip_root)
 	@# Components of the recovery image
 	$(hide) mkdir -p $(zip_root)/RECOVERY
+	$(hide) mkdir -p $(zip_root)/BOOT
+	$(hide) mkdir -p $(zip_root)/FIRMWARE
 ifneq ($(TARGET_MAKE_INTEL_BOOTIMAGE),)
 	$(hide) $(call package_files-copy-root, \
 		$(TARGET_RECOVERY_ROOT_OUT),$(zip_root)/RECOVERY/RAMDISK)
@@ -240,8 +259,10 @@ ifdef BOARD_KERNEL_PAGESIZE
 	$(hide) echo "$(BOARD_KERNEL_PAGESIZE)" > $(zip_root)/RECOVERY/pagesize
 endif
 endif # !TARGET_MAKE_INTEL_BOOTIMAGE
+ifeq ($(RECOVERY_DO_PARTITIONING),true)
+	$(hide) $(ACP) $(PRODUCT_OUT)/partition.tbl $(zip_root)/RECOVERY/
+endif
 	@# Components of the boot image
-	$(hide) mkdir -p $(zip_root)/BOOT
 ifeq ($(TARGET_MAKE_INTEL_BOOTIMAGE),true)
 	$(hide) mkdir -p $(zip_root)/RECOVERY/RAMDISK/etc
 	$(hide) $(ACP) $(PRODUCT_OUT)/recovery.img $(zip_root)/RECOVERY/
@@ -251,8 +272,7 @@ ifeq ($(TARGET_USE_DROIDBOOT),true)
 	$(hide) $(ACP) $(PRODUCT_OUT)/droidboot.img $(zip_root)/RECOVERY/
 endif
 	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
-	$(hide) mkdir -p $(zip_root)/FIRMWARE
-	$(hide) find $(PRODUCT_OUT)/ifwi -type f -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
+	$(hide) -find $(PRODUCT_OUT)/ifwi -type f -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
 else
 	$(hide) $(call package_files-copy-root, \
 		$(TARGET_ROOT_OUT),$(zip_root)/BOOT/RAMDISK)
@@ -288,10 +308,16 @@ endif # TARGET_MAKE_INTEL_BOOTIMAGE
 	$(hide) $(ACP) $(INSTALLED_ANDROID_INFO_TXT_TARGET) $(zip_root)/OTA/
 	$(hide) $(ACP) $(PRIVATE_OTA_TOOLS) $(zip_root)/OTA/bin/
 ifeq ($(BOARD_HAS_CAPSULE),true)
-	$(ACP) $(IFWI_PREBUILT_PATHS)/capsule.bin $(zip_root)/FIRMWARE/capsule.bin
+#We test if IFWI_PREBUILT_PATHS is correctly set to avoid issue with external build
+ifneq (,$(wildcard $(IFWI_PREBUILT_PATHS)))
+	$(hide) $(ACP) $(IFWI_PREBUILT_PATHS)/capsule.bin $(zip_root)/FIRMWARE/capsule.bin
+endif
 endif
 ifeq ($(BOARD_HAS_ULPMC),true)
 	$(ACP) $(ULPMC_BINARY) $(zip_root)/FIRMWARE/ulpmc.bin
+endif
+ifneq ($(INSTALLED_ESPIMAGE_TARGET),)
+	$(hide) $(ACP) $(INSTALLED_ESPIMAGE_TARGET) $(zip_root)/FIRMWARE
 endif
 	@# Files that do not end up in any images, but are necessary to
 	@# build them.
@@ -349,6 +375,12 @@ endif
 name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
+endif
+ifeq ($(RECOVERY_DO_PARTITIONING),true)
+  EXTRA_OTA_GEN_OPTIONS += --do_partitioning
+endif
+ifeq ($(TARGET_PARTITIONING_SCHEME),"full-gpt")
+  EXTRA_OTA_GEN_OPTIONS += --full_gpt
 endif
 name := $(name)-ota-$(FILE_NAME_TAG)
 
