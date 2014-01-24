@@ -46,15 +46,6 @@ recovery_modules += \
 	Intel_PSI_Software_Tools_License_Agreement_101713cl.txt
 endif
 
-ifeq ($(BOARD_HAVE_MODEM), true)
-recovery_modules += \
-	libicuuc \
-	libgabi++ \
-	libstlport \
-	mmgr_xml \
-	telephony_scalability.xml
-endif
-
 recovery_system_files := $(call module-installed-files,$(recovery_modules))
 define recovery-copy-files
 $(hide) $(foreach srcfile,$(recovery_system_files), \
@@ -129,17 +120,11 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/etc
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/tmp
-ifeq ($(BOARD_HAVE_MODEM), true)
-	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/etc/telephony
-endif
 	echo Copying baseline ramdisk...
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_RECOVERY_OUT)
 	rm $(TARGET_RECOVERY_ROOT_OUT)/init*.rc
 	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_RECOVERY_OUT)/root/
 	cp $(TARGET_ROOT_OUT)/init.partlink.rc $(TARGET_RECOVERY_OUT)/root/
-ifeq ($(BOARD_HAVE_MODEM), true)
-	cp $(TARGET_OUT_ETC)/telephony/*.xml $(TARGET_RECOVERY_ROOT_OUT)/etc/telephony/
-endif
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/etc/recovery.fstab $(MKPARTITIONFILE)
