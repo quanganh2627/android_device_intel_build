@@ -68,7 +68,6 @@ ifeq ($(recovery_resources_private),)
   $(info Intel Recovery: No private recovery resources for TARGET_DEVICE $(TARGET_DEVICE))
 endif
 
-
 INTERNAL_RECOVERYIMAGE_ARGS := \
 	$(addprefix --second ,$(INSTALLED_2NDBOOTLOADER_TARGET)) \
 	--kernel $(recovery_kernel) \
@@ -236,10 +235,6 @@ $(BUILT_TARGET_FILES_PACKAGE): \
 	$(hide) rm -rf $@ $(zip_root)
 	$(hide) mkdir -p $(dir $@) $(zip_root)
 	@# Components of the recovery image
-	$(hide) mkdir -p $(zip_root)/RECOVERY
-	$(hide) mkdir -p $(zip_root)/BOOT
-	$(hide) mkdir -p $(zip_root)/FIRMWARE
-ifneq ($(TARGET_MAKE_INTEL_BOOTIMAGE),)
 	$(hide) $(call package_files-copy-root, \
 		$(TARGET_RECOVERY_ROOT_OUT),$(zip_root)/RECOVERY/RAMDISK)
 ifdef INSTALLED_KERNEL_TARGET
@@ -258,12 +253,9 @@ endif
 ifdef BOARD_KERNEL_PAGESIZE
 	$(hide) echo "$(BOARD_KERNEL_PAGESIZE)" > $(zip_root)/RECOVERY/pagesize
 endif
-endif # !TARGET_MAKE_INTEL_BOOTIMAGE
 ifeq ($(RECOVERY_DO_PARTITIONING),true)
 	$(hide) $(ACP) $(PRODUCT_OUT)/partition.tbl $(zip_root)/RECOVERY/
 endif
-	@# Components of the boot image
-ifeq ($(TARGET_MAKE_INTEL_BOOTIMAGE),true)
 	$(hide) mkdir -p $(zip_root)/RECOVERY/RAMDISK/etc
 	$(hide) $(ACP) $(PRODUCT_OUT)/recovery.img $(zip_root)/RECOVERY/
 	$(hide) $(ACP) $(TARGET_RECOVERY_ROOT_OUT)/etc/recovery.fstab $(zip_root)/RECOVERY/RAMDISK/etc
@@ -271,11 +263,10 @@ ifeq ($(TARGET_MAKE_INTEL_BOOTIMAGE),true)
 ifeq ($(TARGET_USE_DROIDBOOT),true)
 	$(hide) $(ACP) $(PRODUCT_OUT)/droidboot.img $(zip_root)/RECOVERY/
 endif
-	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
-	$(hide) -find $(PRODUCT_OUT)/ifwi -type f -exec zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
-else
+	@# Components of the boot image
 	$(hide) $(call package_files-copy-root, \
 		$(TARGET_ROOT_OUT),$(zip_root)/BOOT/RAMDISK)
+	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOT/
 ifdef INSTALLED_KERNEL_TARGET
 	$(hide) $(ACP) $(INSTALLED_KERNEL_TARGET) $(zip_root)/BOOT/kernel
 endif
@@ -292,11 +283,9 @@ endif
 ifdef BOARD_KERNEL_PAGESIZE
 	$(hide) echo "$(BOARD_KERNEL_PAGESIZE)" > $(zip_root)/BOOT/pagesize
 endif
-endif # TARGET_MAKE_INTEL_BOOTIMAGE
-
 	$(hide) $(foreach t,$(INSTALLED_RADIOIMAGE_TARGET),\
-	            mkdir -p $(zip_root)/RADIO; \
-	            $(ACP) $(t) $(zip_root)/RADIO/$(notdir $(t));)
+		mkdir -p $(zip_root)/RADIO; \
+		$(ACP) $(t) $(zip_root)/RADIO/$(notdir $(t));)
 	@# Contents of the system image
 	$(hide) $(call package_files-copy-root, \
 		$(SYSTEMIMAGE_SOURCE_DIR),$(zip_root)/SYSTEM)
@@ -307,10 +296,15 @@ endif # TARGET_MAKE_INTEL_BOOTIMAGE
 	$(hide) mkdir -p $(zip_root)/OTA/bin
 	$(hide) $(ACP) $(INSTALLED_ANDROID_INFO_TXT_TARGET) $(zip_root)/OTA/
 	$(hide) $(ACP) $(PRIVATE_OTA_TOOLS) $(zip_root)/OTA/bin/
+	@# Components of the firmware
+	$(hide) mkdir -p $(zip_root)/FIRMWARE
+	$(hide) -find $(PRODUCT_OUT)/ifwi -type f -exec \
+		zip -qj $(zip_root)/FIRMWARE/ifwi.zip {} \;
 ifeq ($(BOARD_HAS_CAPSULE),true)
-#We test if IFWI_PREBUILT_PATHS is correctly set to avoid issue with external build
+	@#Test IFWI_PREBUILT_PATHS to avoid issue with external build
 ifneq (,$(wildcard $(IFWI_PREBUILT_PATHS)))
-	$(hide) $(ACP) $(IFWI_PREBUILT_PATHS)/capsule.bin $(zip_root)/FIRMWARE/capsule.bin
+	$(hide) $(ACP) $(IFWI_PREBUILT_PATHS)/capsule.bin \
+		$(zip_root)/FIRMWARE/capsule.bin
 endif
 endif
 ifeq ($(BOARD_HAS_ULPMC),true)

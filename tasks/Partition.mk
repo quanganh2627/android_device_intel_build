@@ -1,3 +1,6 @@
+ifeq ($(TARGET_ARCH),x86)
+ifneq ($(TARGET_PRODUCT),sdk)
+ifeq ($(filter generic%,$(TARGET_DEVICE)),)
 DEFAULT_PARTITION := $(TOP)/device/intel/common/storage/default_partition.json
 DEFAULT_MOUNT := $(TOP)/device/intel/common/storage/default_mount.json
 PART_MOUNT_OVERRIDE_FILE := $(call get-specific-config-file ,storage/part_mount_override.json)
@@ -41,3 +44,6 @@ $(BUILT_RAMDISK_TARGET): \
 	$(PRODUCT_OUT)/root/fstab.ramconsole.$(TARGET_DEVICE)
 
 blank_flashfiles: $(PRODUCT_OUT)/partition.tbl
+endif    # TARGET_DEVICE != generic*
+endif    # TARGET_PRODUCT != sdk
+endif    # TARGET_ARCH := x86
