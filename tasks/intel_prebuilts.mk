@@ -4,7 +4,7 @@ $(intel_prebuilts_top_makefile):
 	@mkdir -p $(dir $@)
 	@echo 'LOCAL_PATH := $$(call my-dir)' > $@
 	@echo 'ifeq ($$(TARGET_ARCH),x86)' >> $@
-	@echo 'include $$(shell find $$(LOCAL_PATH) -mindepth 2 -name "Android.mk")' >> $@
+	@echo 'include $$(shell find -L $$(LOCAL_PATH) -mindepth 2 -name "Android.mk")' >> $@
 	@echo 'endif' >> $@
 endif
 
