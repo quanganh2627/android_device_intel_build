@@ -13,6 +13,7 @@ droidboot_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
 droidboot_binary := $(call intermediates-dir-for,EXECUTABLES,droidboot)/droidboot
 droidboot_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_watchdogd
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
+droidboot_thermald := $(call intermediates-dir-for,EXECUTABLES,thermald)/thermald
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
 
 droidboot_modules := \
@@ -129,6 +130,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(droidboot_initrc) \
 		$(droidboot_kernel) \
 		$(droidboot_logcat) \
+		$(droidboot_thermald) \
 		$(droidboot_build_prop) \
 		$(PRODUCT_OUT)/partition.tbl \
 		isu \
@@ -169,6 +171,7 @@ endif
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin/
 	cp -f $(droidboot_logcat) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/logcat
+	cp -f $(droidboot_thermald) $(TARGET_DROIDBOOT_ROOT_OUT)/sbin/
 ifeq ($(TARGET_BOARD_PLATFORM), clovertrail)
 	cp -f $(droidboot_pvrsrvctl) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
 endif
