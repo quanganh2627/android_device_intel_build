@@ -340,31 +340,15 @@ endif
 ifdef PRODUCT_EXTRA_RECOVERY_KEYS
 	$(hide) echo "extra_recovery_keys=$(PRODUCT_EXTRA_RECOVERY_KEYS)" >> $(zip_root)/META/misc_info.txt
 endif
-ifeq ($(BOARD_HAS_CAPSULE),true)
-	$(hide) echo "intel_capsule=true" >> $(zip_root)/META/misc_info.txt
-else
-	$(hide) echo "intel_capsule=false" >> $(zip_root)/META/misc_info.txt
-endif
-ifeq ($(BOARD_HAS_ULPMC),true)
-	$(hide) echo "intel_ulpmc=true" >> $(zip_root)/META/misc_info.txt
-else
-	$(hide) echo "intel_ulpmc=false" >> $(zip_root)/META/misc_info.txt
-endif
-ifeq ($(BOARD_HAVE_MODEM),false)
-	$(hide) echo "no_modem=true" >> $(zip_root)/META/misc_info.txt
-else
-	$(hide) echo "no_modem=false" >> $(zip_root)/META/misc_info.txt
-endif
+	$(hide) echo "intel_capsule=$(BOARD_HAS_CAPSULE)" >> $(zip_root)/META/misc_info.txt
+	$(hide) echo "intel_ulpmc=$(BOARD_HAS_ULPMC)" >> $(zip_root)/META/misc_info.txt
+	$(hide) echo "has_modem=$(BOARD_HAVE_MODEM)" >> $(zip_root)/META/misc_info.txt
 ifeq ($(BUILD_WITH_SECURITY_FRAMEWORK),chaabi_token)
 	$(hide) echo "intel_chaabi_token=true" >> $(zip_root)/META/misc_info.txt
 else
 	$(hide) echo "intel_chaabi_token=false" >> $(zip_root)/META/misc_info.txt
 endif
-ifeq ($(RECOVERY_DO_PARTITIONING),true)
-	$(hide) echo "do_partitioning=true" >> $(zip_root)/META/misc_info.txt
-else
-	$(hide) echo "do_partitioning=false" >> $(zip_root)/META/misc_info.txt
-endif
+	$(hide) echo "do_partitioning=$(RECOVERY_DO_PARTITIONING)" >> $(zip_root)/META/misc_info.txt
 	$(call generate-userimage-prop-dictionary, $(zip_root)/META/misc_info.txt)
 	@# Zip everything up, preserving symlinks
 	$(hide) (cd $(zip_root) && zip $(ZIP_COMP) -qry ../$(notdir $@) .)
