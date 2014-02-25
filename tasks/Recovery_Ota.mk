@@ -340,6 +340,31 @@ endif
 ifdef PRODUCT_EXTRA_RECOVERY_KEYS
 	$(hide) echo "extra_recovery_keys=$(PRODUCT_EXTRA_RECOVERY_KEYS)" >> $(zip_root)/META/misc_info.txt
 endif
+ifeq ($(BOARD_HAS_CAPSULE),true)
+	$(hide) echo "intel_capsule=true" >> $(zip_root)/META/misc_info.txt
+else
+	$(hide) echo "intel_capsule=false" >> $(zip_root)/META/misc_info.txt
+endif
+ifeq ($(BOARD_HAS_ULPMC),true)
+	$(hide) echo "intel_ulpmc=true" >> $(zip_root)/META/misc_info.txt
+else
+	$(hide) echo "intel_ulpmc=false" >> $(zip_root)/META/misc_info.txt
+endif
+ifeq ($(BOARD_HAVE_MODEM),false)
+	$(hide) echo "no_modem=true" >> $(zip_root)/META/misc_info.txt
+else
+	$(hide) echo "no_modem=false" >> $(zip_root)/META/misc_info.txt
+endif
+ifeq ($(BUILD_WITH_SECURITY_FRAMEWORK),chaabi_token)
+	$(hide) echo "intel_chaabi_token=true" >> $(zip_root)/META/misc_info.txt
+else
+	$(hide) echo "intel_chaabi_token=false" >> $(zip_root)/META/misc_info.txt
+endif
+ifeq ($(RECOVERY_DO_PARTITIONING),true)
+	$(hide) echo "do_partitioning=true" >> $(zip_root)/META/misc_info.txt
+else
+	$(hide) echo "do_partitioning=false" >> $(zip_root)/META/misc_info.txt
+endif
 	$(call generate-userimage-prop-dictionary, $(zip_root)/META/misc_info.txt)
 	@# Zip everything up, preserving symlinks
 	$(hide) (cd $(zip_root) && zip $(ZIP_COMP) -qry ../$(notdir $@) .)
@@ -360,27 +385,9 @@ ifneq ($(TARGET_NO_KERNEL),true)
 # -----------------------------------------------------------------
 # OTA update package
 
-ifeq ($(BOARD_HAS_CAPSULE),true)
-  EXTRA_OTA_GEN_OPTIONS += --intel_capsule
-endif
-ifeq ($(BOARD_HAS_ULPMC),true)
-  EXTRA_OTA_GEN_OPTIONS += --intel_ulpmc
-endif
-ifeq ($(BOARD_HAVE_MODEM),false)
-  EXTRA_OTA_GEN_OPTIONS += --no_modem
-endif
-ifeq ($(BUILD_WITH_SECURITY_FRAMEWORK),chaabi_token)
-  EXTRA_OTA_GEN_OPTIONS += --intel_chaabi_token
-endif
 name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
-endif
-ifeq ($(RECOVERY_DO_PARTITIONING),true)
-  EXTRA_OTA_GEN_OPTIONS += --do_partitioning
-endif
-ifeq ($(TARGET_PARTITIONING_SCHEME),"full-gpt")
-  EXTRA_OTA_GEN_OPTIONS += --full_gpt
 endif
 name := $(name)-ota-$(FILE_NAME_TAG)
 
