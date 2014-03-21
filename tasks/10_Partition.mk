@@ -1,4 +1,4 @@
-ifeq ($(TARGET_ARCH),x86)
+ifeq ($(TARGET_ARCH),$(filter $(TARGET_ARCH), x86 x86_64))
 ifneq ($(TARGET_PRODUCT),sdk)
 ifeq ($(filter generic%,$(TARGET_DEVICE)),)
 DEFAULT_PARTITION := $(TOP)/device/intel/common/storage/default_partition.json
