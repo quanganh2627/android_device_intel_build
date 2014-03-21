@@ -1,6 +1,12 @@
 DEFAULT_PARTITION := $(TOP)/device/intel/common/storage/default_partition.json
 DEFAULT_MOUNT := $(TOP)/device/intel/common/storage/default_mount.json
+
+ifneq ($(OVERRIDE_PARTITION_FILE),)
+PART_MOUNT_OVERRIDE_FILE := $(OVERRIDE_PARTITION_FILE)
+else
 PART_MOUNT_OVERRIDE_FILE := $(call get-specific-config-file ,storage/part_mount_override.json)
+endif
+
 ifeq ($(BIGCORE_USB_INSTALLER),true)
 PART_MOUNT_OVERRIDE_FILE := $(call get-specific-config-file ,storage/part_mount_override_usbboot.json)
 endif
