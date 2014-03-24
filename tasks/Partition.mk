@@ -10,6 +10,8 @@ endif
 PART_MOUNT_OVERRIDE_FILES := $(call get-all-config-files ,storage/part_mount_override.json)
 PART_MOUNT_OUT := $(PRODUCT_OUT)
 
+TARGET_PARTITION_TABLE := $(PRODUCT_OUT)/partition.tbl
+
 MKPARTITIONFILE:= \
 	$(TOP)/vendor/intel/support/partition.py \
 	$(DEFAULT_PARTITION) \
@@ -19,7 +21,7 @@ MKPARTITIONFILE:= \
 	"$(TARGET_DEVICE)"
 
 # partition table for fastboot os
-$(PRODUCT_OUT)/partition.tbl: $(DEFAULT_PARTITION) $(DEFAULT_MOUNT) $(PART_MOUNT_OVERRIDE_FILES)
+$(TARGET_PARTITION_TABLE): $(DEFAULT_PARTITION) $(DEFAULT_MOUNT) $(PART_MOUNT_OVERRIDE_FILES)
 	$(hide)mkdir -p $(dir $@)
 	PART_MOUNT_OUT_FILE=$@	$(MKPARTITIONFILE)
 
@@ -43,7 +45,7 @@ $(BUILT_RAMDISK_TARGET): \
 	$(PRODUCT_OUT)/root/fstab.charger.$(TARGET_DEVICE) \
 	$(PRODUCT_OUT)/root/fstab.ramconsole.$(TARGET_DEVICE)
 
-blank_flashfiles: $(PRODUCT_OUT)/partition.tbl
+blank_flashfiles: $(TARGET_PARTITION_TABLE)
 endif    # TARGET_DEVICE != generic*
 endif    # TARGET_PRODUCT != sdk
 endif    # TARGET_ARCH := x86

@@ -16,14 +16,14 @@ ifneq (,$(filter $(TARGET_ARCH),x86-64)$(filter $(BOARD_USE_64BIT_KERNEL),true))
    EFI_BOOT_FILE_NAME := bootx64.efi
 endif
 
-
 EFILINUX_MODULE := efilinux-$(TARGET_BUILD_VARIANT)
+INSTALLED_EFILINUX_MODULE := $(PRODUCT_OUT)/$(EFILINUX_MODULE).efi
 
 $(INSTALLED_ESPIMAGE_TARGET): $(BUILD_ESPIMAGE_DIR) $(EFILINUX_MODULE) warmdump | $(HOST_OUT_EXECUTABLES)/mcopy $(HOST_OUT_EXECUTABLES)/mkdosfs
 	$(call pretty,"Target ESP image: $@")
 	$(hide) mkdir -p $(PRODUCT_OUT)/esp/EFI/BOOT $(PRODUCT_OUT)/esp/EFI/Intel $(PRODUCT_OUT)/esp/EFI/Intel/Data
-	$(hide) $(ACP) $(PRODUCT_OUT)/$(EFILINUX_MODULE).efi $(PRODUCT_OUT)/esp/EFI/BOOT/$(EFI_BOOT_FILE_NAME)
-	$(hide) $(ACP) $(PRODUCT_OUT)/$(EFILINUX_MODULE).efi $(PRODUCT_OUT)/esp/EFI/Intel/efilinux.efi
+	$(hide) $(ACP) $(INSTALLED_EFILINUX_MODULE) $(PRODUCT_OUT)/esp/EFI/BOOT/$(EFI_BOOT_FILE_NAME)
+	$(hide) $(ACP) $(INSTALLED_EFILINUX_MODULE) $(PRODUCT_OUT)/esp/EFI/Intel/efilinux.efi
 	$(hide) $(ACP) $(PRODUCT_OUT)/warmdump.efi $(PRODUCT_OUT)/esp/EFI/Intel/
 
 	$(hide) vendor/intel/support/make_vfatfs "ESP" \
