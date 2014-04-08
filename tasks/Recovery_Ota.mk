@@ -50,9 +50,7 @@ ifeq ($(BOARD_HAVE_MODEM), true)
 recovery_modules += \
 	libicuuc \
 	libgabi++ \
-	libstlport \
-	mmgr_xml \
-	telephony_scalability.xml
+	libstlport
 endif
 
 recovery_system_files := $(call module-installed-files,$(recovery_modules))
@@ -137,9 +135,6 @@ endif
 	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_RECOVERY_OUT)/root/
 	cp $(TARGET_ROOT_OUT)/init.partlink.rc $(TARGET_RECOVERY_OUT)/root/
 	-cp $(TARGET_ROOT_OUT)/init.firmware.rc $(TARGET_RECOVERY_OUT)/root/
-ifeq ($(BOARD_HAVE_MODEM), true)
-	cp $(TARGET_OUT_ETC)/telephony/*.xml $(TARGET_RECOVERY_ROOT_OUT)/etc/telephony/
-endif
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/etc/recovery.fstab $(MKPARTITIONFILE)
