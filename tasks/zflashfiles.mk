@@ -174,12 +174,34 @@ PUB_IFWI_DIR := $(PUBLISH_TARGET)/IFWI
 PUB_IFWI := $(subst $(PRODUCT_OUT)/ifwi,$(PUB_IFWI_DIR),$(INTERNAL_FIRMWARE_FILES))
 
 $(PUB_IFWI_DIR)/%: $(PRODUCT_OUT)/ifwi/% | $(ACP)
-	@echo "Publish ifwi $(notdir $@)"
+	@ echo "Publish ifwi $(notdir $@)"
 	$(hide) mkdir -p $(@D)
 	$(hide) $(ACP) $< $@
 
 .PHONY: publish_ifwi
 publish_ifwi: $(PUB_IFWI)
+
+PUB_INTEL_PREBUILTS := $(PUBLISH_TARGET)/prebuilts.zip
+
+EXTERNAL_CUSTOMER ?= "g"
+
+INTEL_PREBUILTS_LIST := $(shell repo forall -g bsp-priv -a $(EXTERNAL_CUSTOMER)_external=bin -p -c echo 2> /dev/null)
+INTEL_PREBUILTS_LIST := $(filter-out project,$(INTEL_PREBUILTS_LIST))
+INTEL_PREBUILTS_LIST := $(addprefix prebuilts/intel/, $(subst /PRIVATE/,/prebuilts/$(REF_PRODUCT_NAME)/,$(INTEL_PREBUILTS_LIST)))
+INTEL_PREBUILTS_LIST += prebuilts/intel/Android.mk
+
+$(PUB_INTEL_PREBUILTS): intel_prebuilts
+	@ echo "Publish prebuilts for external release"
+	$(hide) rm -f $@
+	$(hide) cd $(PRODUCT_OUT) && zip -r $(abspath $@) $(INTEL_PREBUILTS_LIST)
+
+.PHONY: publish_prebuilts
+publish_prebuilts: $(PUB_INTEL_PREBUILTS)
+
+# publish external if buildbot set EXTERNAL_BINARIES env variable
+ifeq ($(EXTERNAL_BINARIES),true)
+flashfiles: publish_prebuilts
+endif
 
 # HACKS to build ota and publish modem on buildbot
 ifeq ($(KBUILD_BUILD_HOST),buildbot)
