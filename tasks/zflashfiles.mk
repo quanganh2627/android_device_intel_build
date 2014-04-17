@@ -1,13 +1,14 @@
+# Common variable
+
 PUBLISH_PATH := pub
 PUBLISH_TOOLS_PATH := $(PUBLISH_PATH)/tools
+
+TARGET_PUBLISH_PATH ?= $(shell echo $(TARGET_PRODUCT) | tr '[:lower:]' '[:upper:]')
+PUBLISH_TARGET := $(PUBLISH_PATH)/$(TARGET_PUBLISH_PATH)
 
 ifeq ($(LEGACY_PUBLISH),false)
 
 INSTALLED_MODEM_TARGET := $(call module-installed-files,modem)
-
-TARGET_PUBLISH_PATH ?= $(shell echo $(TARGET_PRODUCT) | tr '[:lower:]' '[:upper:]')
-
-PUBLISH_TARGET := $(PUBLISH_PATH)/$(TARGET_PUBLISH_PATH)
 PUB_FLASHFILES := $(PUBLISH_TARGET)/flash_files/build-$(TARGET_BUILD_VARIANT)
 PUB_SIGNATURE := $(PUBLISH_TARGET)/signing_keys/$(TARGET_BUILD_VARIANT)
 PUB_BLANKFILES := $(PUBLISH_TARGET)/flash_files/blankphone
@@ -134,47 +135,11 @@ $(PUB_MODEM): $(INSTALLED_MODEM_TARGET) | $(ACP)
 .PHONY: publish_modem
 publish_modem: $(PUB_MODEM)
 
-# System symbols
-PUB_SYSTEM_SYMBOLS := $(PUBLISH_TARGET)/fastboot-images/$(TARGET_BUILD_VARIANT)/symbols.tar.gz
-
-$(PUB_SYSTEM_SYMBOLS): systemtarball
-	@echo "Publish system symbols"
-	$(hide) mkdir -p $(@D)
-	$(hide) tar czf $@ $(PRODUCT_OUT)/symbols
-
-.PHONY: publish_system_symbols
-publish_system_symbols: $(PUB_SYSTEM_SYMBOLS)
-
-# Kernel debug
-PUB_KERNEL_DBG := $(PUBLISH_TARGET)/kernel/vmlinux.bz2
-
-$(PUB_KERNEL_DBG): bootimage | $(ACP)
-	@echo "Publish kernel config and symbols"
-	$(hide) mkdir -p $(@D)
-	$(hide) $(ACP) $(PRODUCT_OUT)/linux/kernel/.config $(@D)/kernel.config
-	$(hide) bzip2 -c $(PRODUCT_OUT)/linux/kernel/vmlinux > $@
-
-.PHONY: publish_kernel_debug
-publish_kernel_debug: $(PUB_KERNEL_DBG)
-
-# Linux tools
-PUB_LINUX_TOOLS_DIR := $(PUBLISH_TOOLS_PATH)/linux-x86/bin
-PUB_LINUX_TOOLS := adb fastboot
-PUB_LINUX_TOOLS := $(addprefix $(PUB_LINUX_TOOLS_DIR),$(PUB_LINUX_TOOLS))
-
-$(PUB_LINUX_TOOLS_DIR)/%: $(HOST_OUT_EXECUTABLES)/%
-	$(hide) mkdir -p $(@D)
-	$(hide) $(ACP) $^ $@
-
-.PHONY: publish_linux_tools
-publish_linux_tools: $(PUB_LINUX_TOOLS)
-	@ echo "Publish linux tools"
-
 PUB_IFWI_DIR := $(PUBLISH_TARGET)/IFWI
 PUB_IFWI := $(subst $(PRODUCT_OUT)/ifwi,$(PUB_IFWI_DIR),$(INTERNAL_FIRMWARE_FILES))
 
 $(PUB_IFWI_DIR)/%: $(PRODUCT_OUT)/ifwi/% | $(ACP)
-	@ echo "Publish ifwi $(notdir $@)"
+	@echo "Publish ifwi $(notdir $@)"
 	$(hide) mkdir -p $(@D)
 	$(hide) $(ACP) $< $@
 
@@ -191,7 +156,7 @@ INTEL_PREBUILTS_LIST := $(addprefix prebuilts/intel/, $(subst /PRIVATE/,/prebuil
 INTEL_PREBUILTS_LIST += prebuilts/intel/Android.mk
 
 $(PUB_INTEL_PREBUILTS): intel_prebuilts
-	@ echo "Publish prebuilts for external release"
+	@echo "Publish prebuilts for external release"
 	$(hide) rm -f $@
 	$(hide) cd $(PRODUCT_OUT) && zip -r $(abspath $@) $(INTEL_PREBUILTS_LIST)
 
@@ -223,3 +188,48 @@ system_img:
 endif # PUBLISH_CONF
 
 endif # LEGACY_PUBLSH != true
+
+# Common Publish
+
+# System symbols
+PUB_SYSTEM_SYMBOLS := $(PUBLISH_TARGET)/fastboot-images/$(TARGET_BUILD_VARIANT)/symbols.tar.gz
+
+$(PUB_SYSTEM_SYMBOLS): systemtarball
+	@echo "Publish system symbols"
+	$(hide) mkdir -p $(@D)
+	$(hide) tar czf $@ $(PRODUCT_OUT)/symbols
+
+.PHONY: publish_system_symbols
+publish_system_symbols: $(PUB_SYSTEM_SYMBOLS)
+
+# Kernel debug
+PUB_KERNEL_DBG := .config.bz2 vmlinux.bz2 System.map.bz2
+PUB_KERNEL_DBG_PATH := $(PUBLISH_TARGET)/kernel
+PUB_KERNEL_DBG := $(addprefix $(PUB_KERNEL_DBG_PATH)/,$(PUB_KERNEL_DBG))
+
+$(PUB_KERNEL_DBG_PATH)/%: build_kernel | $(ACP)
+	$(hide) mkdir -p $(@D)
+	$(hide) bzip2 -c $(PRODUCT_OUT)/linux/kernel/$(basename $(@F)) > $@
+
+PUB_KERNEL_MODULES = $(PUB_KERNEL_DBG_PATH)/kernel_modules-$(TARGET_BUILD_VARIANT).tar.bz2
+
+$(PUB_KERNEL_MODULES): build_kernel
+	$(hide) mkdir -p $(@D)
+	$(hide) tar -cjf $@ -C $(PRODUCT_OUT)/root/lib/modules .
+
+.PHONY: publish_kernel_debug
+publish_kernel_debug: $(PUB_KERNEL_DBG) $(PUB_KERNEL_MODULES)
+	@echo "Publish kernel debug: $(notdir $^)"
+
+# Linux tools
+PUB_LINUX_TOOLS_DIR := $(PUBLISH_TOOLS_PATH)/linux-x86/bin
+PUB_LINUX_TOOLS := adb fastboot
+PUB_LINUX_TOOLS := $(addprefix $(PUB_LINUX_TOOLS_DIR),$(PUB_LINUX_TOOLS))
+
+$(PUB_LINUX_TOOLS_DIR)/%: $(HOST_OUT_EXECUTABLES)/%
+	$(hide) mkdir -p $(@D)
+	$(hide) $(ACP) $^ $@
+
+.PHONY: publish_linux_tools
+publish_linux_tools: $(PUB_LINUX_TOOLS)
+	@echo "Publish linux tools"
