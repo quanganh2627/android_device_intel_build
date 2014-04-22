@@ -136,4 +136,24 @@ publish_modem:
 	BOARD_HAVE_MODEM=$(BOARD_HAVE_MODEM) \
 	$(SUPPORT_PATH)/publish_build.py 'modem' $(REF_PRODUCT_NAME) $(TARGET_DEVICE) $(PUBLISH_TARGET_BUILD_VARIANT) $(FILE_NAME_TAG) $(TARGET_BOARD_SOC) $(TARGET_USE_XEN)
 
+publish_system_symbols: systemtarball
+	@ echo "Publish system symbols"
+	@ mkdir -p $(PUBLISH_PATH)/$(TARGET_PUBLISH_PATH)/fastboot-images/$(TARGET_BUILD_VARIANT)
+	tar czf $(PUBLISH_PATH)/$(TARGET_PUBLISH_PATH)/fastboot-images/$(TARGET_BUILD_VARIANT)/symbols.tar.gz $(PRODUCT_OUT)/symbols
+
+publish_kernel_debug: bootimage
+	@ echo "Publish kernel config and symbols"
+	@ mkdir -p $(PUBLISH_PATH)/$(TARGET_PUBLISH_PATH)/kernel
+	cp $(PRODUCT_OUT)/linux/kernel/.config $(PUBLISH_PATH)/$(TARGET_PUBLISH_PATH)/kernel/kernel.config
+	bzip2 -k $(PRODUCT_OUT)/linux/kernel/vmlinux
+	mv $(PRODUCT_OUT)/linux/kernel/vmlinux.bz2 $(PUBLISH_PATH)/$(TARGET_PUBLISH_PATH)/kernel/
+
+PUBLISH_LINUX_TOOLS_deps := \
+    $(HOST_OUT_EXECUTABLES)/adb \
+    $(HOST_OUT_EXECUTABLES)/fastboot
+publish_linux_tools: $(PUBLISH_LINUX_TOOLS_deps) | $(ACP)
+	@ echo "Publish linux tools"
+	@ mkdir -p $(PUBLISH_TOOLS_PATH)/linux-x86/bin
+	$(hide) $(ACP) $^ $(PUBLISH_TOOLS_PATH)/linux-x86/bin
+
 endif
