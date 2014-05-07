@@ -306,7 +306,7 @@ ifeq ($(BOARD_HAS_ULPMC),true)
 	$(ACP) $(ULPMC_BINARY) $(zip_root)/FIRMWARE/ulpmc.bin
 endif
 ifneq ($(INSTALLED_ESPIMAGE_TARGET),)
-	$(hide) $(ACP) $(INSTALLED_ESPIMAGE_TARGET) $(zip_root)/FIRMWARE
+	$(hide) $(ACP) $(ESPUPDATE_ZIP_TARGET) $(zip_root)/FIRMWARE
 endif
 	@# Files that do not end up in any images, but are necessary to
 	@# build them.

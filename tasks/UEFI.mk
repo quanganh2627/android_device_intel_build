@@ -31,4 +31,8 @@ $(INSTALLED_ESPIMAGE_TARGET): $(BUILD_ESPIMAGE_DIR) $(EFILINUX_MODULE) warmdump 
 		$(shell python -c 'import json; print json.load(open("'$(PART_MOUNT_OVERRIDE_FILE)'"))["partitions"]["ESP"]["size"]') \
 		$(PRODUCT_OUT)/esp
 
-espimage: $(INSTALLED_ESPIMAGE_TARGET)
+$(ESPUPDATE_ZIP_TARGET): $(INSTALLED_ESPIMAGE_TARGET)
+	$(hide) rm -f $@
+	$(hide) cd $(BUILD_ESPIMAGE_DIR) && zip -r $(abspath $@) *
+
+espimage: $(INSTALLED_ESPIMAGE_TARGET) $(ESPUPDATE_ZIP_TARGET)
