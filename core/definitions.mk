@@ -35,6 +35,6 @@ EFI_ARCH_CFLAGS_x86_64 := -m64 -DCONFIG_X86_64
 EFI_EXTRA_CFLAGS := $(EFI_ARCH_CFLAGS_$(EFI_ARCH)) -fPIC -fPIE \
     -fshort-wchar -ffreestanding -Wall -fstack-protector \
     -Wl,-z,noexecstack -O2 -D_FORTIFY_SOURCE=2 \
-    -g -fno-merge-constants
+    -g -fno-merge-constants -DGNU_EFI_USE_MS_ABI
 
 BUILD_UEFI_EXECUTABLE := bootable/uefi/uefi_executable.mk
