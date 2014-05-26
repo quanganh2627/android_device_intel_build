@@ -126,11 +126,13 @@ $(PUB_OTA_ZIP): $(PUB_OTA_XML) $(INTERNAL_OTA_PACKAGE_TARGET)
 ota_flashfile: $(PUB_OTA_ZIP) $(PUB_OTA_INPUT) $(PUB_OTA_FILE)
 
 # Modem
+ifeq ($(BOARD_HAVE_MODEM),true)
 PUB_MODEM := $(PUBLISH_TARGET)/fastboot-images/$(notdir $(INSTALLED_MODEM_TARGET))
 
 $(PUB_MODEM): $(INSTALLED_MODEM_TARGET) | $(ACP)
 	$(hide) mkdir -p $(@D)
 	$(hide) $(ACP) $^ $@
+endif
 
 .PHONY: publish_modem
 publish_modem: $(PUB_MODEM)
