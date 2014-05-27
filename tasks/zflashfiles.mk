@@ -166,8 +166,11 @@ $(PUB_INTEL_PREBUILTS): intel_prebuilts
 publish_prebuilts: $(PUB_INTEL_PREBUILTS)
 
 # publish external if buildbot set EXTERNAL_BINARIES env variable
+# and only for userdebug
+ifeq (userdebug,$(TARGET_BUILD_VARIANT))
 ifeq ($(EXTERNAL_BINARIES),true)
 flashfiles: publish_prebuilts
+endif
 endif
 
 # HACKS to build ota and publish modem on buildbot
