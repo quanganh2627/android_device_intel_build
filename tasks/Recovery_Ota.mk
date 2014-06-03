@@ -36,16 +36,6 @@ recovery_modules := \
 	libusbhost \
 	teeprov
 
-ifeq ($(HAS_SPINOR),true)
-recovery_modules += \
-	FPT \
-	fparts.txt \
-	TXEManuf \
-	TXEManuf.cfg \
-	vsccommn.bin \
-	Intel_PSI_Software_Tools_License_Agreement_101713cl.txt
-endif
-
 ifeq ($(BOARD_HAVE_MODEM), true)
 recovery_modules += \
 	libicuuc \
