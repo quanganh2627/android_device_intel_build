@@ -220,6 +220,7 @@ $(BUILT_TARGET_FILES_PACKAGE): \
 		$(INSTALLED_USERDATAIMAGE_TARGET) \
 		$(INSTALLED_CACHEIMAGE_TARGET) \
 		$(INSTALLED_ANDROID_INFO_TXT_TARGET) \
+		$(INSTALLED_CAPSULE_TARGET) \
 		$(built_ota_tools) \
 		$(APKCERTS_FILE) \
 		$(HOST_OUT_EXECUTABLES)/fs_config \
@@ -300,8 +301,14 @@ ifeq ($(BOARD_HAS_CAPSULE),true)
 ifneq (,$(wildcard $(IFWI_PREBUILT_PATHS)))
 	$(hide) $(ACP) $(IFWI_PREBUILT_PATHS)/capsule.bin \
 		$(zip_root)/FIRMWARE/capsule.bin
+else
+ifneq (,$(INSTALLED_CAPSULE_TARGET))
+	$(hide) $(ACP) $(INSTALLED_CAPSULE_TARGET) \
+		$(zip_root)/FIRMWARE/capsule.bin
 endif
 endif
+endif
+
 ifeq ($(BOARD_HAS_ULPMC),true)
 	$(ACP) $(ULPMC_BINARY) $(zip_root)/FIRMWARE/ulpmc.bin
 endif
