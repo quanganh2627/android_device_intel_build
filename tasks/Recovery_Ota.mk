@@ -334,6 +334,7 @@ ifeq ($(BUILD_WITH_SECURITY_FRAMEWORK),chaabi_token)
 else
 	$(hide) echo "intel_chaabi_token=false" >> $(zip_root)/META/misc_info.txt
 endif
+	$(hide) echo "bios_type=$(TARGET_BIOS_TYPE)" >> $(zip_root)/META/misc_info.txt
 	$(hide) echo "do_partitioning=$(RECOVERY_DO_PARTITIONING)" >> $(zip_root)/META/misc_info.txt
 	$(call generate-userimage-prop-dictionary, $(zip_root)/META/misc_info.txt)
 	@# Zip everything up, preserving symlinks
