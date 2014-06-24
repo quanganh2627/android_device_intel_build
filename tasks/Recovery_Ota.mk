@@ -309,6 +309,9 @@ endif
 ifneq ($(INSTALLED_ESPIMAGE_TARGET),)
 	$(hide) $(ACP) $(ESPUPDATE_ZIP_TARGET) $(zip_root)/FIRMWARE
 endif
+ifeq ($(INTEL_FEATURE_SILENTLAKE),true)
+	$(hide) $(ACP) $(PRODUCT_OUT)/sl_vmm.bin $(zip_root)/FIRMWARE/silentlake.img
+endif
 	@# Files that do not end up in any images, but are necessary to
 	@# build them.
 	$(hide) mkdir -p $(zip_root)/META
@@ -340,6 +343,7 @@ else
 endif
 	$(hide) echo "bios_type=$(TARGET_BIOS_TYPE)" >> $(zip_root)/META/misc_info.txt
 	$(hide) echo "do_partitioning=$(RECOVERY_DO_PARTITIONING)" >> $(zip_root)/META/misc_info.txt
+	$(hide) echo "has_silentlake=$(INTEL_FEATURE_SILENTLAKE)" >> $(zip_root)/META/misc_info.txt
 	$(call generate-userimage-prop-dictionary, $(zip_root)/META/misc_info.txt)
 	@# Zip everything up, preserving symlinks
 	$(hide) (cd $(zip_root) && zip $(ZIP_COMP) -qry ../$(notdir $@) .)
