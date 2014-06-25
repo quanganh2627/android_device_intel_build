@@ -163,7 +163,11 @@ endif
 	        > $(TARGET_DROIDBOOT_ROOT_OUT)/default.prop
 	$(hide) $(call droidboot-copy-files,$(TARGET_OUT),$(TARGET_DROIDBOOT_ROOT_OUT)/system/)
 	$(MKBOOTFS) $(TARGET_DROIDBOOT_ROOT_OUT) | $(MINIGZIP) > $(droidboot_ramdisk)
+ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE), true)
 	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_DROIDBOOTIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS)
+else
+	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_DROIDBOOTIMAGE_ARGS) --output $@ $(BOARD_MKBOOTIMG_ARGS)
+endif
 	@echo ----- Made droidboot image -------- $@
 
 else

@@ -148,7 +148,11 @@ endif
 	cat $(INSTALLED_DEFAULT_PROP_TARGET) $(recovery_build_prop) \
 	        > $(TARGET_RECOVERY_ROOT_OUT)/default.prop
 	$(MKBOOTFS) $(TARGET_RECOVERY_ROOT_OUT) | $(MINIGZIP) > $(recovery_ramdisk)
+ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE), true)
 	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_RECOVERYIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS)
+else
+	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_RECOVERYIMAGE_ARGS) --output $@ $(BOARD_MKBOOTIMG_ARGS)
+endif
 	@echo ----- Made recovery image -------- $@
 	$(hide) $(call assert-max-image-size,$@,$(BOARD_RECOVERYIMAGE_PARTITION_SIZE),raw)
 else
