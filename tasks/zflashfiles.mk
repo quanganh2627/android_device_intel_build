@@ -180,17 +180,17 @@ flashfiles: publish_modem
 endif
 endif # buildbot
 
-ifneq ($(PUBLISH_CONF),)
-BUILDBOT_PUBLISH_DEPS := $(shell python -c 'import json,os ; print " ".join(json.loads(os.environ["PUBLISH_CONF"]).get("$(TARGET_BUILD_VARIANT)",[]))')
+#ifneq ($(PUBLISH_CONF),)
+#BUILDBOT_PUBLISH_DEPS := $(shell python -c 'import json,os ; print " ".join(json.loads(os.environ["PUBLISH_CONF"]).get("$(TARGET_BUILD_VARIANT)",[]))')
 
 # Translate buildbot target to makefile target
-flashfiles: $(BUILDBOT_PUBLISH_DEPS)
+#flashfiles: $(BUILDBOT_PUBLISH_DEPS)
 
-full_ota: $(PUB_OTA_FILE)
-full_ota_flashfile: $(PUB_OTA_ZIP)
-ota_target_files: $(PUB_OTA_INPUT)
-system_img:
-endif # PUBLISH_CONF
+#full_ota: $(PUB_OTA_FILE)
+#full_ota_flashfile: $(PUB_OTA_ZIP)
+#ota_target_files: $(PUB_OTA_INPUT)
+#system_img:
+#endif # PUBLISH_CONF
 
 endif # LEGACY_PUBLSH != true
 
