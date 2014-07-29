@@ -18,7 +18,7 @@ recovery_binary := $(call intermediates-dir-for,EXECUTABLES,recovery)/recovery
 recovery_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat_static)/logcat_static
 recovery_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_watchdogd
 recovery_thermal_rosd := $(call intermediates-dir-for,EXECUTABLES,thermald)/thermald
-recovery_resources_common := $(call include-path-for, recovery)/res
+recovery_resources_common := $(call include-path-for, recovery)/res-xhdpi
 recovery_resources_private := $(strip $(wildcard $(TARGET_DEVICE_DIR)/recovery/res))
 recovery_resource_deps := $(shell find $(recovery_resources_common) \
   $(recovery_resources_private) -type f)

@@ -16,7 +16,6 @@ ramdump_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_w
 ramdump_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 ramdump_thermald := $(call intermediates-dir-for,EXECUTABLES,thermald)/thermald
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
-ramdump_netcat := $(call intermediates-dir-for,EXECUTABLES,nc)/nc
 
 ramdump_modules := \
 	libc \
@@ -102,7 +101,6 @@ $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(ramdump_initrc) \
 		$(ramdump_kernel) \
 		$(ramdump_logcat) \
-		$(ramdump_netcat) \
 		$(ramdump_thermald) \
 		$(ramdump_build_prop) \
 		$(PRODUCT_OUT)/partition.tbl \
@@ -135,7 +133,6 @@ $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	cp -f $(droidboot_binary) $(TARGET_RAMDUMP_ROOT_OUT)/system/bin/
 	cp -f $(ramdump_watchdogd) $(TARGET_RAMDUMP_ROOT_OUT)/usr/bin/
 	cp -f $(ramdump_logcat) $(TARGET_RAMDUMP_ROOT_OUT)/system/bin/logcat
-	cp -f $(ramdump_netcat) $(TARGET_RAMDUMP_ROOT_OUT)/system/bin/nc
 	cp -f $(ramdump_thermald) $(TARGET_RAMDUMP_ROOT_OUT)/sbin/
 	cp -rf $(droidboot_resources_common) $(TARGET_RAMDUMP_ROOT_OUT)/
 	cat $(INSTALLED_DEFAULT_PROP_TARGET) $(ramdump_build_prop) \
