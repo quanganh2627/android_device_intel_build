@@ -24,7 +24,7 @@ droidboot_modules := \
 	libm \
 	libstdc++ \
 	linker \
-	mksh \
+	sh \
 	systembinsh \
 	toolbox \
 	libdiskconfig \

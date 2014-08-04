@@ -25,7 +25,7 @@ recovery_resource_deps := $(shell find $(recovery_resources_common) \
 recovery_modules := \
 	toolbox \
 	libselinux \
-	mksh \
+	sh \
 	strace \
 	linker \
 	libc \
@@ -141,7 +141,7 @@ endif
 	cp -f $(recovery_thermal_rosd) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
 	$(hide) $(call recovery-copy-files,$(TARGET_OUT),$(TARGET_RECOVERY_ROOT_OUT)/system/)
 	cp -f $(recovery_logcat) $(TARGET_RECOVERY_ROOT_OUT)/sbin/logcat
-	cp -rf $(recovery_resources_common) $(TARGET_RECOVERY_ROOT_OUT)/
+	cp -rf $(recovery_resources_common)/* $(TARGET_RECOVERY_ROOT_OUT)/res/
 	$(foreach item,$(recovery_resources_private), \
 	  cp -rf $(item) $(TARGET_RECOVERY_ROOT_OUT)/)
 	cp $(RECOVERY_INSTALL_OTA_KEYS) $(TARGET_RECOVERY_ROOT_OUT)/res/keys
