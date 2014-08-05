@@ -120,7 +120,6 @@ $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_RAMDUMP_OUT)
 	rm $(TARGET_RAMDUMP_ROOT_OUT)/init*.rc
 	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_RAMDUMP_OUT)/root/
-	cp $(TARGET_ROOT_OUT)/init.diskd.rc $(TARGET_RAMDUMP_OUT)/root/
 	-cp $(TARGET_ROOT_OUT)/init.firmware.rc $(TARGET_RAMDUMP_OUT)/root/
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_RAMDUMP_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)

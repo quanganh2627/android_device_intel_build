@@ -122,7 +122,6 @@ endif
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_RECOVERY_OUT)
 	rm $(TARGET_RECOVERY_ROOT_OUT)/init*.rc
 	cp $(TARGET_ROOT_OUT)/init.watchdog.rc $(TARGET_RECOVERY_OUT)/root/
-	cp $(TARGET_ROOT_OUT)/init.diskd.rc $(TARGET_RECOVERY_OUT)/root/
 	-cp $(TARGET_ROOT_OUT)/init.firmware.rc $(TARGET_RECOVERY_OUT)/root/
 	echo Modifying ramdisk contents...
 	PART_MOUNT_OUT_FILE=$(TARGET_RECOVERY_OUT)/root/fstab.$(TARGET_DEVICE) $(MKPARTITIONFILE)
