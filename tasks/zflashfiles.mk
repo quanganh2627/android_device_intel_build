@@ -56,10 +56,6 @@ pub_flashfiles: $(FLASHFILES_IMAGES) $(FLASHFILES_XML)| $(ACP)
 flashfiles_nozip: $(FLASHFILES_XML) $(FLASHFILES_IMAGES)
 
 PUB_ZIP := $(PUB_FLASHFILES)/$(TARGET_PRODUCT)-$(TARGET_BUILD_VARIANT)-fastboot-$(FILE_NAME_TAG).zip
-# Warn userdbug doesn't boot to UI and prevent ACS from using userdebug for test
-ifeq ($(TARGET_BUILD_VARIANT),userdebug)
-  PUB_ZIP := $(PUB_FLASHFILES)/does-not-boot-to-ui-fastboot-$(FILE_NAME_TAG).zip
-endif
 
 .PHONY: fastboot_flashfile
 fastboot_flashfile: $(PUB_ZIP)
