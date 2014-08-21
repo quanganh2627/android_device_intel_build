@@ -21,6 +21,7 @@ droidboot_modules := \
 	libcutils \
 	libdl \
 	liblog \
+	libcrypto \
 	libm \
 	libstdc++ \
 	linker \
