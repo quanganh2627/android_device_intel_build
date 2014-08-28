@@ -15,7 +15,6 @@ recovery_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
 recovery_ramdisk := $(PRODUCT_OUT)/ramdisk-recovery.img
 recovery_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
 recovery_binary := $(call intermediates-dir-for,EXECUTABLES,recovery)/recovery
-recovery_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat_static)/logcat_static
 recovery_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_watchdogd
 recovery_thermal_rosd := $(call intermediates-dir-for,EXECUTABLES,thermald)/thermald
 recovery_resources_common := $(call include-path-for, recovery)/res-xhdpi
@@ -103,7 +102,6 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 		$(recovery_thermal_rosd) \
 		$(recovery_initrc) \
 		$(recovery_kernel) \
-		$(recovery_logcat) \
 		$(INSTALLED_2NDBOOTLOADER_TARGET) \
 		$(recovery_build_prop) $(recovery_resource_deps) \
 		$(recovery_system_files) \
@@ -140,7 +138,6 @@ endif
 	cp -f $(recovery_watchdogd) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
 	cp -f $(recovery_thermal_rosd) $(TARGET_RECOVERY_ROOT_OUT)/sbin/
 	$(hide) $(call recovery-copy-files,$(TARGET_OUT),$(TARGET_RECOVERY_ROOT_OUT)/system/)
-	cp -f $(recovery_logcat) $(TARGET_RECOVERY_ROOT_OUT)/sbin/logcat
 	cp -rf $(recovery_resources_common)/* $(TARGET_RECOVERY_ROOT_OUT)/res/
 	$(foreach item,$(recovery_resources_private), \
 	  cp -rf $(item) $(TARGET_RECOVERY_ROOT_OUT)/)
