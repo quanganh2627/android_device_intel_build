@@ -30,6 +30,7 @@ recovery_modules := \
 	libc \
 	libcutils \
 	liblog \
+	libcrypto \
 	libm \
 	libstdc++ \
 	libusbhost \
