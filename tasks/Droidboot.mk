@@ -22,6 +22,7 @@ droidboot_modules := \
 	libdl \
 	liblog \
 	libcrypto \
+	libext2_quota \
 	libm \
 	libstdc++ \
 	linker \
