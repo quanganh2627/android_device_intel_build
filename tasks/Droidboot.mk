@@ -46,14 +46,7 @@ droidboot_modules := \
 	e2fsck \
 	gzip \
 	kexec \
-	droidboot \
-
-ifeq ($(BOARD_HAVE_MODEM), true)
-droidboot_modules += \
-	libicuuc \
-	libgabi++ \
-	libstlport
-endif
+	droidboot
 
 ifeq ($(TARGET_BOARD_PLATFORM), clovertrail)
 droidboot_pvrsrvctl := $(PRODUCT_OUT)/system/vendor/bin/pvrsrvctl
@@ -130,9 +123,6 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/tmp
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc
-ifeq ($(BOARD_HAVE_MODEM), true)
-	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc/telephony
-endif
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/mnt/sdcard
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin

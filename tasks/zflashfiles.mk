@@ -8,7 +8,6 @@ PUBLISH_TARGET := $(PUBLISH_PATH)/$(TARGET_PUBLISH_PATH)
 
 ifeq ($(LEGACY_PUBLISH),false)
 
-INSTALLED_MODEM_TARGET := $(call module-installed-files,modem)
 PUB_FLASHFILES := $(PUBLISH_TARGET)/flash_files/build-$(TARGET_BUILD_VARIANT)
 PUB_SIGNATURE := $(PUBLISH_TARGET)/signing_keys/$(TARGET_BUILD_VARIANT)
 PUB_BLANKFILES := $(PUBLISH_TARGET)/flash_files/blankphone
@@ -125,18 +124,6 @@ $(PUB_OTA_ZIP): $(PUB_OTA_XML) $(INTERNAL_OTA_PACKAGE_TARGET)
 .PHONY: ota_flashfile
 ota_flashfile: $(PUB_OTA_ZIP) $(PUB_OTA_INPUT) $(PUB_OTA_FILE)
 
-# Modem
-ifeq ($(BOARD_HAVE_MODEM),true)
-PUB_MODEM := $(PUBLISH_TARGET)/fastboot-images/$(notdir $(INSTALLED_MODEM_TARGET))
-
-$(PUB_MODEM): $(INSTALLED_MODEM_TARGET) | $(ACP)
-	$(hide) mkdir -p $(@D)
-	$(hide) $(ACP) $^ $@
-endif
-
-.PHONY: publish_modem
-publish_modem: $(PUB_MODEM)
-
 PUB_IFWI_DIR := $(PUBLISH_TARGET)/IFWI
 PUB_IFWI := $(subst $(PRODUCT_OUT)/ifwi,$(PUB_IFWI_DIR),$(INTERNAL_FIRMWARE_FILES))
 
@@ -172,13 +159,6 @@ ifeq ($(EXTERNAL_BINARIES),true)
 flashfiles: publish_prebuilts
 endif
 endif
-
-# HACKS to build ota and publish modem on buildbot
-ifeq ($(KBUILD_BUILD_HOST),buildbot)
-ifeq ($(BOARD_HAVE_MODEM),true)
-flashfiles: publish_modem
-endif
-endif # buildbot
 
 ifneq ($(PUBLISH_CONF),)
 BUILDBOT_PUBLISH_DEPS := $(shell python -c 'import json,os ; print " ".join(json.loads(os.environ["PUBLISH_CONF"]).get("$(TARGET_BUILD_VARIANT)",[]))')

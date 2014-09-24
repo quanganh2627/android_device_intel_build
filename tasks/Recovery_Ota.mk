@@ -36,13 +36,6 @@ recovery_modules := \
 	libusbhost \
 	teeprov
 
-ifeq ($(BOARD_HAVE_MODEM), true)
-recovery_modules += \
-	libicuuc \
-	libgabi++ \
-	libstlport
-endif
-
 recovery_system_files := $(call module-installed-files,$(recovery_modules))
 define recovery-copy-files
 $(hide) $(foreach srcfile,$(recovery_system_files), \
@@ -115,9 +108,6 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP) \
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/etc
 	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/tmp
-ifeq ($(BOARD_HAVE_MODEM), true)
-	mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/etc/telephony
-endif
 	echo Copying baseline ramdisk...
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_RECOVERY_OUT)
 	rm $(TARGET_RECOVERY_ROOT_OUT)/init*.rc
@@ -332,7 +322,6 @@ ifdef PRODUCT_EXTRA_RECOVERY_KEYS
 endif
 	$(hide) echo "intel_capsule=$(BOARD_HAS_CAPSULE)" >> $(zip_root)/META/misc_info.txt
 	$(hide) echo "intel_ulpmc=$(BOARD_HAS_ULPMC)" >> $(zip_root)/META/misc_info.txt
-	$(hide) echo "has_modem=$(BOARD_HAVE_MODEM)" >> $(zip_root)/META/misc_info.txt
 ifeq ($(BUILD_WITH_SECURITY_FRAMEWORK),chaabi_token)
 	$(hide) echo "intel_chaabi_token=true" >> $(zip_root)/META/misc_info.txt
 else
