@@ -15,3 +15,8 @@ INSTALLED_CAPSULE_TARGET := $(strip $(foreach fw,$(INTERNAL_FIRMWARE_FILES),\
     $(if $(filter %/capsule/,$(dir $(fw))),$(fw))))
 INSTALLED_STAGE2_TARGET := $(strip $(foreach fw,$(INTERNAL_FIRMWARE_FILES),\
     $(if $(filter %/stage2/,$(dir $(fw))),$(fw))))
+
+INSTALLED_OTA_CAPSULE_TARGET := $(PRODUCT_OUT)/capsule.bin
+
+$(INSTALLED_OTA_CAPSULE_TARGET): $(INSTALLED_CAPSULE_TARGET) | $(ACP)
+	$(ACP) $^ $@
