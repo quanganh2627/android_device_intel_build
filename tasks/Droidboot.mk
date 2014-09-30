@@ -5,6 +5,9 @@ TARGET_DROIDBOOT_ROOT_OUT := $(TARGET_DROIDBOOT_OUT)/root
 DROIDBOOT_PATH := $(TOP)/bootable/droidboot
 
 INSTALLED_DROIDBOOTIMAGE_TARGET := $(PRODUCT_OUT)/droidboot.img
+INSTALLED_DROIDBOOTIMAGE_DNX_TARGET := $(PRODUCT_OUT)/droidboot_dnx.img
+
+DNX_MKBOOTIMG := vendor/intel/support/
 
 droidboot_initrc := $(call get-specific-config-file ,droidboot.init.rc)
 droidboot_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
@@ -15,6 +18,7 @@ droidboot_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 droidboot_thermald := $(call intermediates-dir-for,EXECUTABLES,thermald)/thermald
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
+droidboot_bootstub := $(PRODUCT_OUT)/bootstub
 
 droidboot_modules := \
 	libc \
@@ -108,6 +112,7 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(INSTALLED_BOOTIMAGE_TARGET) \
 		$(droidboot_system_files) \
 		$(droidboot_binary) \
+		$(droidboot_bootstub) \
 		$(droidboot_watchdogd) \
 		$(droidboot_initrc) \
 		$(droidboot_kernel) \
@@ -161,9 +166,18 @@ else
 endif
 	@echo ----- Made droidboot image -------- $@
 
+ifeq ($(TARGET_MAKE_OSIP_DNX_IMAGE), true)
+$(INSTALLED_DROIDBOOTIMAGE_DNX_TARGET): $(INSTALLED_DROIDBOOTIMAGE_TARGET)
+	# Generate OSIP stitched droidboot img version
+	LOCAL_SIGN=$(LOCAL_SIGN) $(DNX_MKBOOTIMG)/mkbootimg $(COMMON_BOOTIMAGE_ARGS) $(INTERNAL_DROIDBOOTIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS) --bootstub $(droidboot_bootstub) --type droidboot
+	@echo ----- Made droidboot_dnx image --------  $@
+else
+INSTALLED_DROIDBOOTIMAGE_DNX_TARGET :=
+endif
 else
 INSTALLED_DROIDBOOTIMAGE_TARGET :=
+INSTALLED_DROIDBOOTIMAGE_DNX_TARGET :=
 endif
 
 .PHONY: droidbootimage
-droidbootimage: $(INSTALLED_DROIDBOOTIMAGE_TARGET)
+droidbootimage: $(INSTALLED_DROIDBOOTIMAGE_TARGET) $(INSTALLED_DROIDBOOTIMAGE_DNX_TARGET)

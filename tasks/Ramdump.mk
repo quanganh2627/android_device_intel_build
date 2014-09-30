@@ -16,16 +16,18 @@ ramdump_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_w
 ramdump_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 ramdump_thermald := $(call intermediates-dir-for,EXECUTABLES,thermald)/thermald
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
+ramdump_bootstub := $(PRODUCT_OUT)/bootstub_ramdump
 
 ramdump_modules := \
 	libc \
 	libcutils \
 	libdl \
 	liblog \
+	libcrypto \
 	libm \
 	libstdc++ \
 	linker \
-	mksh \
+	sh \
 	systembinsh \
 	toolbox \
 	libdiskconfig \
@@ -60,11 +62,14 @@ $(hide) $(foreach srcfile,$(ramdump_system_files), \
 )
 endef
 
-
+# Base address hardcoded in system/core/mkbootimg/mkbootimg.c is 0x1000_0000
+# second bootloader offset is relative to this one: 0x1000_0000 + 0x6800_0000
+# => bootstub is expected to be located at 0x7800_0000
 INTERNAL_RAMDUMPIMAGE_ARGS := \
-	$(addprefix --second ,$(INSTALLED_2NDBOOTLOADER_TARGET)) \
+	$(addprefix --second ,$(ramdump_bootstub)) \
 	--kernel $(ramdump_kernel) \
-	--ramdisk $(ramdump_ramdisk)
+	--ramdisk $(ramdump_ramdisk) \
+	--base 0x78000000
 
 ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE),true)
 	# Allow board to overwrite the type used for droid boot image
@@ -74,6 +79,7 @@ ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE),true)
 		INTERNAL_RAMDUMPIMAGE_ARGS += --type ramdump
 	endif
 endif
+
 
 # Assumes this has already been stripped
 ifdef BOARD_KERNEL_CMDLINE
@@ -87,8 +93,7 @@ ifdef BOARD_KERNEL_PAGESIZE
   INTERNAL_RAMDUMPIMAGE_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
 endif
 
-RAMDUMP_BOOTIMAGE_ARGS = --sign-with $(TARGET_OS_SIGNING_METHOD) \
-	--bootstub $(PRODUCT_OUT)/bootstub_ramdump
+
 
 $(INSTALLED_KERNEL_RAMDUMP_TARGET): build_bzImage_kdump
 
@@ -97,6 +102,7 @@ $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(INSTALLED_BOOTIMAGE_TARGET) \
 		$(ramdump_system_files) \
 		$(ramdump_binary) \
+		$(ramdump_bootstub) \
 		$(ramdump_watchdogd) \
 		$(ramdump_initrc) \
 		$(ramdump_kernel) \
@@ -105,8 +111,7 @@ $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(ramdump_build_prop) \
 		$(PRODUCT_OUT)/partition.tbl \
 		isu \
-		isu_wrapper \
-		$(PRODUCT_OUT)/bootstub_ramdump
+		isu_wrapper
 	@echo ----- Making ramdump image ------
 	rm -rf $(TARGET_RAMDUMP_OUT)
 	mkdir -p $(TARGET_RAMDUMP_OUT)
@@ -138,7 +143,11 @@ $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	        > $(TARGET_RAMDUMP_ROOT_OUT)/default.prop
 	$(hide) $(call ramdump-copy-files,$(TARGET_OUT),$(TARGET_RAMDUMP_ROOT_OUT)/system/)
 	$(MKBOOTFS) $(TARGET_RAMDUMP_ROOT_OUT) | $(MINIGZIP) > $(ramdump_ramdisk)
+ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE), true)
 	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(RAMDUMP_BOOTIMAGE_ARGS) $(INTERNAL_RAMDUMPIMAGE_ARGS) --output $@ $(ADDITIONAL_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS)
+else
+	LOCAL_SIGN=$(LOCAL_SIGN) $(MKBOOTIMG) $(RAMDUMP_BOOTIMAGE_ARGS) $(INTERNAL_RAMDUMPIMAGE_ARGS) --output $@ $(BOARD_MKBOOTIMG_ARGS)
+endif
 	@echo ----- Made ramdump image -------- $@
 
 else
@@ -146,4 +155,4 @@ INSTALLED_RAMDUMPIMAGE_TARGET :=
 endif
 
 .PHONY: ramdumpimage
-ramdumpimage: $(droidboot_binary) $(INSTALLED_RAMDUMPIMAGE_TARGET)
+ramdumpimage: $(INSTALLED_DROIDBOOTIMAGE_TARGET) $(INSTALLED_RAMDUMPIMAGE_TARGET)
