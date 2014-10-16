@@ -12,7 +12,6 @@ ramdump_kernel := $(INSTALLED_KERNEL_RAMDUMP_TARGET) # same as kexec
 ramdump_ramdisk := $(PRODUCT_OUT)/ramdisk-ramdump.img
 ramdump_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
 droidboot_binary := $(call intermediates-dir-for,EXECUTABLES,droidboot)/droidboot
-ramdump_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_watchdogd
 ramdump_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 ramdump_thermald := $(call intermediates-dir-for,EXECUTABLES,thermald)/thermald
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
@@ -93,8 +92,6 @@ ifdef BOARD_KERNEL_PAGESIZE
   INTERNAL_RAMDUMPIMAGE_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
 endif
 
-
-
 $(INSTALLED_KERNEL_RAMDUMP_TARGET): build_bzImage_kdump
 
 $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
@@ -103,7 +100,6 @@ $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(ramdump_system_files) \
 		$(ramdump_binary) \
 		$(ramdump_bootstub) \
-		$(ramdump_watchdogd) \
 		$(ramdump_initrc) \
 		$(ramdump_kernel) \
 		$(ramdump_logcat) \
@@ -120,7 +116,6 @@ $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	mkdir -p $(TARGET_RAMDUMP_ROOT_OUT)/system/etc
 	mkdir -p $(TARGET_RAMDUMP_ROOT_OUT)/system/bin
 	mkdir -p $(TARGET_RAMDUMP_ROOT_OUT)/mnt/sdcard
-	mkdir -p $(TARGET_RAMDUMP_ROOT_OUT)/usr/bin
 	echo Copying baseline ramdisk...
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_RAMDUMP_OUT)
 	rm $(TARGET_RAMDUMP_ROOT_OUT)/init*.rc
@@ -135,7 +130,6 @@ $(INSTALLED_RAMDUMPIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	cp -f $(DEVICE_CONF_PATH)/ramdump.init.$(TARGET_DEVICE).rc $(TARGET_RAMDUMP_ROOT_OUT); \
 	fi
 	cp -f $(droidboot_binary) $(TARGET_RAMDUMP_ROOT_OUT)/system/bin/
-	cp -f $(ramdump_watchdogd) $(TARGET_RAMDUMP_ROOT_OUT)/usr/bin/
 	cp -f $(ramdump_logcat) $(TARGET_RAMDUMP_ROOT_OUT)/system/bin/logcat
 	cp -f $(ramdump_thermald) $(TARGET_RAMDUMP_ROOT_OUT)/sbin/
 	cp -rf $(droidboot_resources_common) $(TARGET_RAMDUMP_ROOT_OUT)/

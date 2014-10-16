@@ -14,7 +14,6 @@ droidboot_kernel := $(INSTALLED_KERNEL_TARGET) # same as a non-recovery system
 droidboot_ramdisk := $(PRODUCT_OUT)/ramdisk-droidboot.img
 droidboot_build_prop := $(INSTALLED_BUILD_PROP_TARGET)
 droidboot_binary := $(call intermediates-dir-for,EXECUTABLES,droidboot)/droidboot
-droidboot_watchdogd := $(call intermediates-dir-for,EXECUTABLES,ia_watchdogd)/ia_watchdogd
 droidboot_logcat := $(call intermediates-dir-for,EXECUTABLES,logcat)/logcat
 droidboot_thermald := $(call intermediates-dir-for,EXECUTABLES,thermald)/thermald
 droidboot_resources_common := $(DROIDBOOT_PATH)/res
@@ -113,7 +112,6 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 		$(droidboot_system_files) \
 		$(droidboot_binary) \
 		$(droidboot_bootstub) \
-		$(droidboot_watchdogd) \
 		$(droidboot_initrc) \
 		$(droidboot_kernel) \
 		$(droidboot_logcat) \
@@ -130,7 +128,6 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/etc
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin
 	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/mnt/sdcard
-	mkdir -p $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin
 	echo Copying baseline ramdisk...
 	cp -R $(TARGET_ROOT_OUT) $(TARGET_DROIDBOOT_OUT)
 	rm $(TARGET_DROIDBOOT_ROOT_OUT)/init*.rc
@@ -148,7 +145,6 @@ $(INSTALLED_DROIDBOOTIMAGE_TARGET): $(MKBOOTFS) $(MKBOOTIMG) $(MINIGZIP)\
 	cp -f $(DEVICE_CONF_PATH)/droidboot.init.$(TARGET_DEVICE).rc $(TARGET_DROIDBOOT_ROOT_OUT); \
 	fi
 	cp -f $(droidboot_binary) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/
-	cp -f $(droidboot_watchdogd) $(TARGET_DROIDBOOT_ROOT_OUT)/usr/bin/
 	cp -f $(droidboot_logcat) $(TARGET_DROIDBOOT_ROOT_OUT)/system/bin/logcat
 	cp -f $(droidboot_thermald) $(TARGET_DROIDBOOT_ROOT_OUT)/sbin/
 ifeq ($(TARGET_BOARD_PLATFORM), clovertrail)
