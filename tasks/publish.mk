@@ -14,7 +14,8 @@
 # 	on the one file we need.
 # 	   e.g. 'make publish_ci'
 
-publish_dest := $(TOP)/pub/$(TARGET_PRODUCT)/$(TARGET_BUILD_VARIANT)/
+TARGET_PUBLISH_PATH ?= $(shell echo $(TARGET_PRODUCT) | tr '[:lower:]' '[:upper:]')
+publish_dest := $(TOP)/pub/$(TARGET_PUBLISH_PATH)/$(TARGET_BUILD_VARIANT)/
 publish_make_dir = $(if $(wildcard $1),,mkdir -p $1)
 
 .PHONY: publish_mkdir_dest
@@ -44,6 +45,36 @@ publish_liveimage:
 	@echo "Warning: Unable to fulfill publish_liveimage makefile request"
 endif
 
+.PHONY: publish_factoryscripts
+ifdef FACTORY_SCRIPTS_PACKAGE_TARGET
+publish_factoryscripts: publish_mkdir_dest $(FACTORY_SCRIPTS_PACKAGE_TARGET)
+	@$(ACP) $(FACTORY_SCRIPTS_PACKAGE_TARGET) $(publish_dest)
+else
+publish_factoryscripts:
+	@echo "Warning: Unable to fulfill publish_factoryscripts makefile request"
+endif
+
+.PHONY: publish_fastboot-usb
+ifdef fastboot_usb_bin
+publish_fastboot-usb: publish_mkdir_dest $(fastboot_usb_bin)
+	@$(ACP) $(fastboot_usb_bin) $(publish_dest)
+else
+publish_fastboot-usb:
+	@echo "Warning: Unable to fulfill publish_fastboot-usb makefile request"
+endif
+
+# BYT-M specific ini and shell files
+PUBLISH_CI_BYTM_FILES := $(PRODUCT_OUT)/byt_m_crb-gpt.ini \
+	$(PRODUCT_OUT)/byt_m_crb-flash-all.sh \
+	$(PRODUCT_OUT)/byt_m_crb-flash-incremental.sh \
+	$(PRODUCT_OUT)/byt_m_crb-flash-ci.sh
+
+# To public BYT-M binaries
+.PHONY: publish_ci_bytm
+publish_ci_bytm: publish_factoryscripts publish_fastboot-usb
+	$(if $(wildcard $(publish_dest)), \
+	  $(foreach f,$(PUBLISH_CI_BYTM_FILES), \
+	    $(if $(wildcard $(f)),$(ACP) $(f) $(publish_dest);,)),)
 
 PUBLISH_CI_FILES := $(DIST_DIR)/fastboot $(DIST_DIR)/adb
 .PHONY: publish_ci
