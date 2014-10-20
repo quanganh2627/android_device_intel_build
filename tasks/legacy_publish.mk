@@ -21,6 +21,7 @@ endif
 ifeq ($(TARGET_BIOS_TYPE),"uefi")
 FASTBOOT_FLASHFILE_DEPS += espimage
 endif
+FASTBOOT_FLASHFILE_DEPS += updatepackage
 
 ifeq ($(INTEL_FEATURE_SILENTLAKE),true)
 FASTBOOT_FLASHFILE_DEPS += $(PRODUCT_OUT)/sl_vmm.bin
