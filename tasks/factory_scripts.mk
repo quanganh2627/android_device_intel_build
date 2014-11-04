@@ -20,6 +20,9 @@ $(FACTORY_SCRIPTS_PACKAGE_TARGET): \
 		--bootloader $(PRODUCT_OUT)/bootloader \
 		--update-archive $(INTERNAL_UPDATE_PACKAGE_TARGET) \
 		$(FACTORY_SCRIPTS_RADIO) \
+		--gpt $(BOARD_GPT_INI) \
+		--unlock \
+		--lock \
 		--sleeptime 45 \
 		--output $@
 

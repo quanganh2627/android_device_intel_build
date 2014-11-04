@@ -31,6 +31,7 @@ import tempfile
 import os
 
 _FLASHALL_FILENAME = "flash-all.sh"
+_FLASHCI_FILENAME = "flash-ci.sh"
 # chmod (octal) -rwxr-x--x
 _PERMS = 0751
 _FLASH_HEADER = """#!/bin/bash
@@ -52,9 +53,52 @@ _FLASH_HEADER = """#!/bin/bash
 set -e
 
 """
+
+_FLASH_TCP_IP_INPUTS   = """
+OPTIONS=$1
+IP_ADDRESS=$2
+
+"""
+
+_FLASH_TCP_IP_HANDLERS = """
+# Check if the IP address is changed between reboots
+check_IP_address()
+{
+  echo "====================================================================================="
+  echo "Wait till fastboot "\"UI"\" or "\"device terminal"\" shows IP address"
+  echo "Initial IP address is: $IP_ADDRESS"
+  echo "Enter the new IP address if it is changed, else hit "\"Enter"\" to continue"
+  read text
+  if [ "$text" != "" ]; then
+    IP_ADDRESS=$text
+    echo "Using new IP address: $IP_ADDRESS"
+  else
+    echo "Retaining the initial IP address: $IP_ADDRESS"
+  fi
+  echo "====================================================================================="
+}
+
+# Informational message
+info_message()
+{
+  echo "====================================================================================="
+  echo "Reboot the device into fastboot mode"
+  echo "*********************************************"
+  echo "reboot -> F2 > Boot Manager -> EFI USB Device"
+  echo "*********************OR**********************"
+  echo "Press "\"Volume Down Key"\""
+  echo "*********************************************"
+  echo "If finished, hit any key to continue"
+  read text
+  echo "====================================================================================="
+}
+
+# Start flash commands
+"""
 _FLASH_FOOTER = "\n"
 _FASTBOOT_REBOOT_COMMAND = "reboot-bootloader"
 _WIN_FLASHALL_FILENAME = "flash-all.bat"
+_WIN_FLASHCI_FILENAME = "flash-ci.bat"
 _WIN_FLASH_HEADER = """@ECHO OFF
 :: Copyright 2012 The Android Open Source Project
 ::
@@ -78,9 +122,12 @@ pause >nul
 exit
 
 """
-_LINUX_PREAMBLE   = 'fastboot "$@" '
+_LINUX_PREAMBLE   = 'fastboot $OPTIONS $IP_ADDRESS '
 _WINDOWS_PREAMBLE = 'fastboot %* '
 
+_VALIDATE_IP_ADDRESS_CHANGE = """check_IP_address"""
+
+_PRINT_INFO_MESSAGE = """info_message"""
 
 def Checksum(filename):
     """Find SHA-1 checksum"""
@@ -102,13 +149,16 @@ def ConvertToDOSFormat(filename):
         exit("Please install dos2unix package on your workstation")
 
 
-def AddFlashScript(filename, tar, commands, windows):
+def AddFlashScript(filename, tar, commands, windows, tcpip):
     print "Archiving", filename
     tf = tempfile.NamedTemporaryFile(delete=False)
     if (windows):
         tf.write(_WIN_FLASH_HEADER)
     else:
         tf.write(_FLASH_HEADER)
+        tf.write(_FLASH_TCP_IP_INPUTS)
+        if (tcpip):
+            tf.write(_FLASH_TCP_IP_HANDLERS)
 
     for c in commands:
         if windows:
@@ -159,33 +209,82 @@ class Command:
         return _WINDOWS_PREAMBLE + self.get_command()
 
 class RebootBootloaderCommand(Command):
-    def __init__(self, delay):
+    def __init__(self, delay, ci_build):
         self.delay = delay
+        self.ci_build = ci_build
 
     def get_linux_command(self):
-        return '{} reboot-bootloader\nsleep {}\n'.format(_LINUX_PREAMBLE, self.delay)
+        if self.ci_build:
+            return '{} reboot-bootloader 2>&1\nsleep {}\n'.format(_LINUX_PREAMBLE, self.delay)
+        else:
+            return '{} reboot-bootloader\n{}\n'.format(_LINUX_PREAMBLE, _VALIDATE_IP_ADDRESS_CHANGE)
 
     def get_windows_command(self):
         return '{} reboot-bootloader\nping -n {} 127.0.0.1 >nul\n'.format(_WINDOWS_PREAMBLE,
                 self.delay)
 
+class RebootCommand(Command):
+    def __init__(self, delay):
+        self.delay = delay
+
+    def get_linux_command(self):
+        if self.delay:
+            return '{} reboot\nsleep {}\n'.format(_LINUX_PREAMBLE, self.delay)
+        else:
+            return '{} reboot\n'.format(_LINUX_PREAMBLE)
+
+    def get_windows_command(self):
+        if self.delay:
+            return '{} reboot\nping -n {} 127.0.0.1 >nul\n'.format(_WINDOWS_PREAMBLE,
+                self.delay)
+        else:
+            return '{} reboot\nping -n 127.0.0.1 >nul\n'.format(_WINDOWS_PREAMBLE)
+
 class FlashCommand(Command):
-    def __init__(self, target, image):
+    def __init__(self, target, image, ci_build):
         self.target = target
         self.image = path.basename(image)
+        self.ci_build = ci_build
 
     def get_command(self):
-        return "flash {} {}\n".format(self.target, self.image)
+        if self.ci_build:
+            return "flash {} {} 2>&1\n".format(self.target, self.image)
+        else:
+            return "flash {} {}\n".format(self.target, self.image)
 
 class UpdateCommand(Command):
-    def __init__(self, image, erase):
+    def __init__(self, image, erase, ci_build):
         self.image = path.basename(image)
+        self.ci_build = ci_build
         self.args = ""
         if erase:
             self.args += " -w"
 
     def get_command(self):
-        return "{} update {}\n".format(self.args, self.image)
+        if self.ci_build:
+            return "{} update {} 2>&1\n".format(self.args, self.image)
+        else:
+            return "{} update {}\n{}\n{}\n".format(self.args, self.image, _PRINT_INFO_MESSAGE, _VALIDATE_IP_ADDRESS_CHANGE)
+
+class OEMCommand(Command):
+    def __init__(self, cmd, ci_build):
+        self.cmd = cmd
+        self.ci_build = ci_build
+
+    def get_linux_command(self):
+        if self.ci_build:
+            return '{} oem {} 2>&1\n'.format(_LINUX_PREAMBLE, self.cmd)
+        else:
+            return '{} oem {}\n'.format(_LINUX_PREAMBLE, self.cmd)
+
+    def get_windows_command(self):
+        if self.ci_build:
+            return '{} oem {} 2>&1\n'.format(_WINDOWS_PREAMBLE, self.cmd)
+        else:
+            return '{} oem {}\n'.format(_WINDOWS_PREAMBLE, self.cmd)
+
+    def get_command(self):
+        return "oem {}\n".format(self.cmd)
 
 
 def main():
@@ -206,25 +305,46 @@ def main():
                         help="Output file for archived factory scripts")
     parser.add_argument('-r', '--radio',
                         help="Radio image")
+    parser.add_argument('-g', '--gpt',
+                        help="GPT configuration file")
+    parser.add_argument('-k', '--unlock',
+                        action="store_true", default=False,
+                        help="Unlock the bootloader before doing anything else")
+    parser.add_argument('-l', '--lock',
+                        action="store_true", default=False,
+                        help="Lock the bootloader after flashing the image")
     args = parser.parse_args()
 
     commands = []
+    ci_commands = []
     files = []
 
     buildprefix = args.product + "-" + args.release + "-"
     update_fn = buildprefix + "img.zip"
 
+    if args.unlock:
+        commands.append(OEMCommand("unlock", False))
+        ci_commands.append(OEMCommand("unlock", True))
+
+    if args.gpt:
+        fn = buildprefix + "gpt.ini"
+        files.append((args.gpt, fn))
+        commands.append(FlashCommand("gpt", fn, False))
+
     fn = buildprefix + "bootloader"
     files.append((args.bootloader, fn))
-    commands.append(FlashCommand("bootloader", fn))
+    commands.append(FlashCommand("bootloader", fn, False))
+    ci_commands.append(FlashCommand("bootloader", fn, True))
 
-    commands.append(RebootBootloaderCommand(args.sleeptime))
+    commands.append(RebootBootloaderCommand(args.sleeptime, False))
+    ci_commands.append(RebootBootloaderCommand(args.sleeptime, True))
 
     if args.radio:
         fn = buildprefix + "radio.img"
         files.append((args.radio, fn))
-        commands.append(FlashCommand("radio", fn))
-        commands.append(RebootBootloaderCommand(args.sleeptime))
+        commands.append(FlashCommand("radio", fn, False))
+        commands.append(RebootBootloaderCommand(args.sleeptime, False))
+        ci_commands.append(RebootBootloaderCommand(args.sleeptime, True))
 
     # Archive Name
     archive_name = args.output
@@ -240,12 +360,22 @@ def main():
 
     # 'fastboot update' covers the additional AOSP pieces, add this to the
     # command list now
-    commands.append(UpdateCommand(update_fn, True))
+    commands.append(UpdateCommand(update_fn, True, False))
+    ci_commands.append(UpdateCommand(update_fn, True, True))
     print "Archiving " + args.update_archive
     RequireFile(args.update_archive)
     tar.add(args.update_archive, update_fn)
-    AddFlashScript(_FLASHALL_FILENAME, tar, commands, windows=False)
-    AddFlashScript(_WIN_FLASHALL_FILENAME, tar, commands, windows=True)
+
+    if args.lock:
+        commands.append(OEMCommand("lock", 0))
+
+    commands.append(RebootCommand(0))
+
+    AddFlashScript(_FLASHALL_FILENAME, tar, commands, windows=False, tcpip=True)
+    AddFlashScript(_WIN_FLASHALL_FILENAME, tar, commands, windows=True, tcpip=False)
+
+    AddFlashScript(_FLASHCI_FILENAME, tar, ci_commands, windows=False, tcpip=False)
+    AddFlashScript(_WIN_FLASHCI_FILENAME, tar, ci_commands, windows=True, tcpip=False)
 
     tar.close()
 
