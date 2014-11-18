@@ -113,6 +113,12 @@ mkdir ota/
 
 # FIXME how to get the boot images to come out differently?
 
+echo "Generating UEFI Binaries to create first version"
+
+pushd hardware/intel/kernelflinger
+./generate-prebuilts.sh &> $ANDROID_BUILD_TOP/ota/kernelflinger.log
+popd
+
 echo "Building source software version A"
 make -j12 target-files-package otatools keystore_signer &> ota/make-A.log
 cp $OUT/obj/PACKAGING/target_files_intermediates/$TARGET_PRODUCT-target_files*.zip ota/tfp-A-testkey.zip
