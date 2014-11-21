@@ -115,6 +115,7 @@ mkdir ota/
 
 echo "Generating UEFI Binaries to create first version"
 
+make -j12 keystore_signer
 pushd hardware/intel/kernelflinger
 ./generate-prebuilts.sh &> $ANDROID_BUILD_TOP/ota/kernelflinger.log
 popd
