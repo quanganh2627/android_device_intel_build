@@ -62,13 +62,18 @@ $(hide) $(foreach srcfile,$(ramdump_system_files), \
 )
 endef
 
-# Base address hardcoded in system/core/mkbootimg/mkbootimg.c is 0x1000_0000
-# second bootloader offset is relative to this one: 0x1000_0000 + 0x6800_0000
-# => bootstub is expected to be located at 0x7800_0000
+# Default base address in system/core/mkbootimg/mkbootimg.c is 0x1000_0000.
+# Otherwise, it can be specified by the input --base.
+# Second bootloader default offset is 0x00F00000
+# => bootstub is expected to be located at 0x78F0_0000
+# kernel is placed after the ramdisk, so that it does not overrride it when
+# uncompressed.
 INTERNAL_RAMDUMPIMAGE_ARGS := \
 	$(addprefix --second ,$(ramdump_bootstub)) \
 	--kernel $(ramdump_kernel) \
 	--ramdisk $(ramdump_ramdisk) \
+	--kernel_offset 0x01000800 \
+	--ramdisk_offset 0x00008000 \
 	--base 0x78000000
 
 ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE),true)
@@ -79,7 +84,6 @@ ifeq ($(TARGET_MAKE_NO_DEFAULT_BOOTIMAGE),true)
 		INTERNAL_RAMDUMPIMAGE_ARGS += --type ramdump
 	endif
 endif
-
 
 # Assumes this has already been stripped
 ifdef BOARD_KERNEL_CMDLINE
